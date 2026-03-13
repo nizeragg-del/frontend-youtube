@@ -1,8 +1,16 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { MessageSquare, Calendar, Settings, LogOut, Video } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 import './Sidebar.css';
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -13,7 +21,7 @@ const Sidebar: React.FC = () => {
       <nav className="sidebar-nav">
         <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <MessageSquare size={20} />
-          <span>Chat de Criação</span>
+          <span>Início / Chat</span>
         </NavLink>
         
         <NavLink to="/agendamentos" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
@@ -28,7 +36,7 @@ const Sidebar: React.FC = () => {
       </nav>
       
       <div className="sidebar-footer">
-        <button className="nav-item logout-btn">
+        <button className="nav-item logout-btn" onClick={handleLogout}>
           <LogOut size={20} />
           <span>Sair</span>
         </button>

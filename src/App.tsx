@@ -1,20 +1,55 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from './lib/supabase';
 import MainLayout from './components/layout/MainLayout';
 import Home from './pages/Home';
 import Scheduling from './pages/Scheduling';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 
+// Componente para proteger rotas privadas
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) return <div className="loading-screen">Carregando...</div>;
+  if (!session) return <Navigate to="/login" replace />;
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<MainLayout />}>
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Home />} />
           <Route path="agendamentos" element={<Scheduling />} />
           <Route path="configuracoes" element={<Settings />} />
         </Route>
+        {/* Fallback para home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
