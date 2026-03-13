@@ -9,7 +9,6 @@ const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const suggestionCards = [
@@ -48,7 +47,6 @@ const Home = () => {
 
     setLoading(true);
     setError(null);
-    setSuccess(false);
 
     try {
       // 1. Verificar Autenticação
@@ -102,7 +100,6 @@ const Home = () => {
         throw new Error(errorData.message || "Falha ao iniciar processo no GitHub.");
       }
 
-      setSuccess(true);
       setPrompt("");
       alert("🚀 Sucesso! O motor de geração foi iniciado. Você receberá uma notificação quando o vídeo estiver pronto.");
       

@@ -22,7 +22,7 @@ const Settings: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('user_configs')
         .select('*')
         .eq('user_id', user.id)
