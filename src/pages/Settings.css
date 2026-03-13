@@ -1,0 +1,115 @@
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding-bottom: 100px;
+}
+
+.apis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.api-card {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.api-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.api-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.api-icon {
+  color: var(--color-primary);
+}
+
+.status-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-label.connected {
+  background-color: var(--color-secondary-light);
+  color: var(--color-secondary);
+}
+
+.status-label.error {
+  background-color: #FDEDEC;
+  color: #E74C3C;
+}
+
+.api-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.api-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-sm);
+}
+
+.test-btn {
+  background-color: var(--color-bg-accent);
+  color: var(--color-primary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.test-btn:hover {
+  background-color: var(--color-primary-light);
+}
+
+.docs-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.docs-link:hover {
+  color: var(--color-primary);
+}
+
+.save-bar {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(calc(-50% + 130px)); /* Centered accounting for sidebar */
+  width: 500px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  border: 1px solid var(--color-primary-light);
+}
+
+.save-btn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
