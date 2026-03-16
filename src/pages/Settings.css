@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  padding: 40px 48px 140px;
-  max-width: 1200px;
+  padding: 40px 32px 140px;
+  width: 100%;
   animation: fadeIn 0.5s ease-out;
 }
 
