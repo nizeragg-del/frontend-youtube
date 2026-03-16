@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Key, Check, AlertTriangle, ExternalLink, Save, Youtube } from 'lucide-react';
+import { Check, AlertTriangle, Save, Youtube } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import './Settings.css';
@@ -65,10 +65,6 @@ const YoutubeConnectButton = ({
 };
 
 const Settings: React.FC = () => {
-  const [manusKey, setManusKey] = useState('');
-  const [typecastKey, setTypecastKey] = useState('');
-  const [ytClientId, setYtClientId] = useState('');
-  const [ytClientSecret, setYtClientSecret] = useState('');
   const [ytRefreshToken, setYtRefreshToken] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -90,10 +86,6 @@ const Settings: React.FC = () => {
         .single();
 
       if (data) {
-        setManusKey(data.manus_api_key || '');
-        setTypecastKey(data.typecast_api_key || '');
-        setYtClientId(data.youtube_client_id || '');
-        setYtClientSecret(data.youtube_client_secret || '');
         setYtRefreshToken(data.youtube_refresh_token || '');
       }
     } catch (err) {
@@ -103,7 +95,7 @@ const Settings: React.FC = () => {
     }
   };
 
-  const saveConfigs = async () => {
+  const saveConfigs = async (newToken?: string) => {
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -116,17 +108,17 @@ const Settings: React.FC = () => {
         .from('user_configs')
         .upsert({
           user_id: user.id,
-          manus_api_key: manusKey,
-          typecast_api_key: typecastKey,
-          youtube_client_id: ytClientId,
-          youtube_client_secret: ytClientSecret,
-          youtube_refresh_token: ytRefreshToken,
+          youtube_refresh_token: newToken || ytRefreshToken,
           updated_at: new Date().toISOString()
         });
 
       if (error) throw error;
       setHasChanges(false);
-      alert('Configurações salvas com sucesso!');
+      if (newToken) {
+        alert('YouTube conectado e salvo com sucesso!');
+      } else {
+        alert('Configurações salvas!');
+      }
     } catch (err) {
       console.error('Erro ao salvar:', err);
       alert('Erro ao salvar as configurações.');
@@ -134,6 +126,10 @@ const Settings: React.FC = () => {
       setSaving(false);
     }
   };
+
+  // Pegamos as chaves globais do ambiente (Vercel/Vite)
+  const GLOBAL_YT_CLIENT_ID = import.meta.env.VITE_YOUTUBE_CLIENT_ID;
+  const GLOBAL_YT_CLIENT_SECRET = import.meta.env.VITE_YOUTUBE_CLIENT_SECRET;
 
   if (loading) return <div className="settings-container"><p>Carregando configurações...</p></div>;
 
@@ -147,123 +143,38 @@ const Settings: React.FC = () => {
       </header>
 
       <div className="apis-grid">
-        {/* Manus AI */}
-        <div className="api-card serene-card">
-          <div className="api-header">
-            <div className="api-info">
-              <Shield size={24} className="api-icon" />
-              <h3>Manus AI</h3>
-            </div>
-            <div className={`status-label ${manusKey ? 'connected' : 'error'}`}>
-              {manusKey ? <Check size={14} /> : <AlertTriangle size={14} />}
-              {manusKey ? 'Configurado' : 'Ação Necessária'}
-            </div>
-          </div>
-          <p className="api-desc">Geração de roteiros e imagens via IA.</p>
-          <div className="form-group">
-            <label><Key size={14} /> Chave da API</label>
-            <input 
-              type="password" 
-              className="serene-input" 
-              value={manusKey}
-              onChange={(e) => { setManusKey(e.target.value); setHasChanges(true); }}
-              placeholder="sk-..."
-            />
-          </div>
-        </div>
-
-        {/* Typecast AI */}
-        <div className="api-card serene-card">
-          <div className="api-header">
-            <div className="api-info">
-              <Shield size={24} className="api-icon" />
-              <h3>Typecast AI</h3>
-            </div>
-            <div className={`status-label ${typecastKey ? 'connected' : 'error'}`}>
-              {typecastKey ? <Check size={14} /> : <AlertTriangle size={14} />}
-              {typecastKey ? 'Configurado' : 'Ação Necessária'}
-            </div>
-          </div>
-          <p className="api-desc">Narração realista com vozes premium.</p>
-          <div className="form-group">
-            <label><Key size={14} /> Chave da API</label>
-            <input 
-              type="password" 
-              className="serene-input" 
-              value={typecastKey}
-              onChange={(e) => { setTypecastKey(e.target.value); setHasChanges(true); }}
-              placeholder="Paste your key here"
-            />
-          </div>
-        </div>
-
-        {/* YouTube API */}
-        <div className="api-card serene-card youtube-card">
+        {/* YouTube API Only */}
+        <div className="api-card serene-card youtube-card" style={{ gridColumn: '1 / -1' }}>
           <div className="api-header">
             <div className="api-info">
               <Youtube size={24} className="api-icon youtube" />
-              <h3>YouTube Automation</h3>
+              <h3>Conexão YouTube</h3>
             </div>
             <div className={`status-label ${ytRefreshToken ? 'connected' : 'error'}`}>
               {ytRefreshToken ? <Check size={14} /> : <AlertTriangle size={14} />}
-              {ytRefreshToken ? 'Conectado' : 'Desconectado'}
+              {ytRefreshToken ? 'Conta Vinculada' : 'Ação Necessária'}
             </div>
           </div>
-          <p className="api-desc">Publicação automática de Shorts após a geração.</p>
+          <p className="api-desc">Conecte seu canal para permitir postagens automáticas de Shorts de alta qualidade.</p>
           
-          <div className="form-group">
-            <label>Client ID</label>
-            <input 
-              type="text" 
-              className="serene-input" 
-              value={ytClientId}
-              onChange={(e) => { setYtClientId(e.target.value); setHasChanges(true); }}
-              placeholder="Google Client ID"
-            />
-          </div>
-          <div className="form-group">
-            <label>Client Secret</label>
-            <input 
-              type="password" 
-              className="serene-input" 
-              value={ytClientSecret}
-              onChange={(e) => { setYtClientSecret(e.target.value); setHasChanges(true); }}
-              placeholder="Google Client Secret"
-            />
-          </div>
-          <div className="form-group">
-            <label>Refresh Token</label>
-            <input 
-              type="password" 
-              className="serene-input" 
-              value={ytRefreshToken}
-              readOnly
-              placeholder="Gerado automaticamente ao conectar"
-            />
-          </div>
-
-          <div className="api-actions">
-            {ytClientId && ytClientSecret ? (
-              <GoogleOAuthProvider clientId={ytClientId}>
+          <div className="api-actions" style={{ marginTop: '20px' }}>
+            {GLOBAL_YT_CLIENT_ID && GLOBAL_YT_CLIENT_SECRET ? (
+              <GoogleOAuthProvider clientId={GLOBAL_YT_CLIENT_ID}>
                 <YoutubeConnectButton 
-                  clientId={ytClientId} 
-                  clientSecret={ytClientSecret}
+                  clientId={GLOBAL_YT_CLIENT_ID} 
+                  clientSecret={GLOBAL_YT_CLIENT_SECRET}
                   onTokensReceived={(token) => {
                     setYtRefreshToken(token);
-                    setHasChanges(true);
-                    alert('YouTube conectado com sucesso! Clique em Salvar.');
+                    saveConfigs(token);
                   }}
                 />
               </GoogleOAuthProvider>
             ) : (
-               <button className="yt-connect-btn" disabled title="Preencha o Client ID e Secret primeiro" type="button">
-                 Conectar YouTube
-               </button>
+               <div className="error-box" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e74c3c', fontSize: '0.9rem' }}>
+                 <AlertTriangle size={18} />
+                 <span>Configurações globais de API (VITE_YOUTUBE_CLIENT_ID) ausentes no ambiente.</span>
+               </div>
             )}
-            <a href="https://console.cloud.google.com/" target="_blank" className="docs-link" rel="noreferrer">
-              <span>Google Cloud Console</span>
-              <ExternalLink size={14} />
-            </a>
           </div>
         </div>
       </div>
@@ -271,7 +182,7 @@ const Settings: React.FC = () => {
       {hasChanges && (
         <div className="save-bar serene-card glass-accent">
           <p>Você tem alterações não salvas.</p>
-          <button className="save-btn" onClick={saveConfigs} disabled={saving}>
+          <button className="save-btn" onClick={() => saveConfigs()} disabled={saving}>
             {saving ? 'Salvando...' : 'Salvar Todas as Configurações'}
             <Save size={18} />
           </button>
