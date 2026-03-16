@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Video, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import logo from '../../logo.png';
 
 const Login: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -48,13 +49,16 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-page">
-      <div className="login-card serene-card">
+      <div className="login-card serene-card glass-effect">
         <div className="login-header">
           <div className="logo-section">
-            <Video size={32} className="logo-icon" />
-            <h1>GVE</h1>
+            <img src={logo} alt="Flowyn Logo" className="login-brand-logo" />
+            <div className="logo-text-group">
+              <span className="logo-text">flowyn</span>
+              <span className="logo-subtitle">IA AUTOMAÇÃO</span>
+            </div>
           </div>
-          <p className="login-subtitle">Gerador de Vídeos Evangélicos</p>
+          <p className="login-subtitle">Transforme sua fé em conteúdo inspirador.</p>
         </div>
 
         <div className="tabs">
@@ -142,7 +146,7 @@ const Login: React.FC = () => {
         )}
       </div>
       
-      <p className="page-footer-text">© 2026 GVE - Transformando Fé em Conteúdo.</p>
+      <p className="page-footer-text">© 2024 Flowyn IA - Tecnologia a serviço da Palavra.</p>
     </div>
   );
 };
