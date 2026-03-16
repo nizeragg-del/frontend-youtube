@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, AlertTriangle, Save, Youtube } from 'lucide-react';
+import { Shield, Key, Check, AlertTriangle, Save, Youtube } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import './Settings.css';
@@ -65,6 +65,8 @@ const YoutubeConnectButton = ({
 };
 
 const Settings: React.FC = () => {
+  const [manusKey, setManusKey] = useState('');
+  const [typecastKey, setTypecastKey] = useState('');
   const [ytRefreshToken, setYtRefreshToken] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -86,6 +88,8 @@ const Settings: React.FC = () => {
         .single();
 
       if (data) {
+        setManusKey(data.manus_api_key || '');
+        setTypecastKey(data.typecast_api_key || '');
         setYtRefreshToken(data.youtube_refresh_token || '');
       }
     } catch (err) {
@@ -108,6 +112,8 @@ const Settings: React.FC = () => {
         .from('user_configs')
         .upsert({
           user_id: user.id,
+          manus_api_key: manusKey,
+          typecast_api_key: typecastKey,
           youtube_refresh_token: newToken || ytRefreshToken,
           updated_at: new Date().toISOString()
         });
@@ -143,19 +149,69 @@ const Settings: React.FC = () => {
       </header>
 
       <div className="apis-grid">
-        {/* YouTube API Only */}
-        <div className="api-card serene-card youtube-card" style={{ gridColumn: '1 / -1' }}>
+        {/* Manus AI */}
+        <div className="api-card serene-card">
+          <div className="api-header">
+            <div className="api-info">
+              <Shield size={24} className="api-icon" />
+              <h3>Manus AI</h3>
+            </div>
+            <div className={`status-label ${manusKey ? 'connected' : 'error'}`}>
+              {manusKey ? <Check size={14} /> : <AlertTriangle size={14} />}
+              {manusKey ? 'Configurado' : 'Ação Necessária'}
+            </div>
+          </div>
+          <p className="api-desc">Geração de roteiros e imagens via IA.</p>
+          <div className="form-group">
+            <label><Key size={14} /> Chave da API</label>
+            <input 
+              type="password" 
+              className="serene-input" 
+              value={manusKey}
+              onChange={(e) => { setManusKey(e.target.value); setHasChanges(true); }}
+              placeholder="sk-..."
+            />
+          </div>
+        </div>
+
+        {/* Typecast AI */}
+        <div className="api-card serene-card">
+          <div className="api-header">
+            <div className="api-info">
+              <Shield size={24} className="api-icon" />
+              <h3>Typecast AI</h3>
+            </div>
+            <div className={`status-label ${typecastKey ? 'connected' : 'error'}`}>
+              {typecastKey ? <Check size={14} /> : <AlertTriangle size={14} />}
+              {typecastKey ? 'Configurado' : 'Ação Necessária'}
+            </div>
+          </div>
+          <p className="api-desc">Narração realista com vozes premium.</p>
+          <div className="form-group">
+            <label><Key size={14} /> Chave da API</label>
+            <input 
+              type="password" 
+              className="serene-input" 
+              value={typecastKey}
+              onChange={(e) => { setTypecastKey(e.target.value); setHasChanges(true); }}
+              placeholder="Paste your key here"
+            />
+          </div>
+        </div>
+
+        {/* YouTube API */}
+        <div className="api-card serene-card youtube-card">
           <div className="api-header">
             <div className="api-info">
               <Youtube size={24} className="api-icon youtube" />
-              <h3>Conexão YouTube</h3>
+              <h3>YouTube Automation</h3>
             </div>
             <div className={`status-label ${ytRefreshToken ? 'connected' : 'error'}`}>
               {ytRefreshToken ? <Check size={14} /> : <AlertTriangle size={14} />}
-              {ytRefreshToken ? 'Conta Vinculada' : 'Ação Necessária'}
+              {ytRefreshToken ? 'Conectado' : 'Desconectado'}
             </div>
           </div>
-          <p className="api-desc">Conecte seu canal para permitir postagens automáticas de Shorts de alta qualidade.</p>
+          <p className="api-desc">Publicação automática de Shorts.</p>
           
           <div className="api-actions" style={{ marginTop: '20px' }}>
             {GLOBAL_YT_CLIENT_ID && GLOBAL_YT_CLIENT_SECRET ? (
@@ -172,7 +228,7 @@ const Settings: React.FC = () => {
             ) : (
                <div className="error-box" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e74c3c', fontSize: '0.9rem' }}>
                  <AlertTriangle size={18} />
-                 <span>Configurações globais de API (VITE_YOUTUBE_CLIENT_ID) ausentes no ambiente.</span>
+                 <span>Configurações globais de API ausentes.</span>
                </div>
             )}
           </div>
