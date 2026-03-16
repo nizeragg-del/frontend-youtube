@@ -1,9 +1,9 @@
 .footer {
   width: 100%;
   padding: 40px 0;
-  background-color: white;
+  background-color: var(--color-bg-primary);
   border-top: 1px solid var(--color-border);
-  margin-top: 100px;
+  margin-top: 60px;
 }
 
 .footer-container {
@@ -61,6 +61,6 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
 }

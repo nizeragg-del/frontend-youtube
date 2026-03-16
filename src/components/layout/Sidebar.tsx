@@ -28,10 +28,6 @@ const Sidebar: React.FC = () => {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <img src={logo} alt="Flowyn Logo" className="brand-logo" />
-        <div className="logo-text-group">
-          <span className="logo-text">flowyn</span>
-          <span className="logo-subtitle">IA AUTOMAÇÃO</span>
-        </div>
       </div>
       
       <div className="sidebar-section-label">PROJETOS</div>

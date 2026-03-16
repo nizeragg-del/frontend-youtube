@@ -53,10 +53,6 @@ const Login: React.FC = () => {
         <div className="login-header">
           <div className="logo-section">
             <img src={logo} alt="Flowyn Logo" className="login-brand-logo" />
-            <div className="logo-text-group">
-              <span className="logo-text">flowyn</span>
-              <span className="logo-subtitle">IA AUTOMAÇÃO</span>
-            </div>
           </div>
           <p className="login-subtitle">Transforme sua fé em conteúdo inspirador.</p>
         </div>
