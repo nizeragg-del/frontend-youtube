@@ -92,6 +92,30 @@
   color: var(--color-primary);
 }
 
+.yt-connect-btn {
+  background-color: #ff0000;
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cc0000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yt-connect-btn:hover:not(:disabled) {
+  background-color: #cc0000;
+}
+
+.yt-connect-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .save-bar {
   position: fixed;
   bottom: 2rem;

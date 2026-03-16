@@ -1,7 +1,68 @@
 import { useState, useEffect } from 'react';
 import { Shield, Key, Check, AlertTriangle, ExternalLink, Save, Youtube } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import './Settings.css';
+
+const YoutubeConnectButton = ({ 
+  clientId, 
+  clientSecret, 
+  onTokensReceived 
+}: { 
+  clientId: string; 
+  clientSecret: string; 
+  onTokensReceived: (token: string) => void;
+}) => {
+  const [loading, setLoading] = useState(false);
+
+  const login = useGoogleLogin({
+    flow: 'auth-code',
+    scope: 'https://www.googleapis.com/auth/youtube.upload',
+    onSuccess: async (codeResponse) => {
+      setLoading(true);
+      try {
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            code: codeResponse.code,
+            client_id: clientId,
+            client_secret: clientSecret,
+            redirect_uri: 'postmessage',
+            grant_type: 'authorization_code'
+          })
+        });
+        const data = await response.json();
+        if (data.refresh_token) {
+          onTokensReceived(data.refresh_token);
+        } else {
+          console.error("Token response:", data);
+          alert('Não foi possível obter o Refresh Token. Certifique-se de autorizar o aplicativo.');
+        }
+      } catch (err) {
+        console.error('Erro na troca de código:', err);
+        alert('Erro ao conectar ao YouTube.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: errorResponse => {
+      console.error('Login falhou:', errorResponse);
+      alert('Login falhou. Verifique se o Client ID é válido e a URI está autorizada.');
+    }
+  });
+
+  return (
+    <button 
+      className="yt-connect-btn" 
+      onClick={() => login()} 
+      disabled={loading}
+      type="button"
+    >
+      {loading ? 'Conectando...' : 'Conectar YouTube'}
+    </button>
+  );
+};
 
 const Settings: React.FC = () => {
   const [manusKey, setManusKey] = useState('');
@@ -176,13 +237,30 @@ const Settings: React.FC = () => {
               type="password" 
               className="serene-input" 
               value={ytRefreshToken}
-              onChange={(e) => { setYtRefreshToken(e.target.value); setHasChanges(true); }}
-              placeholder="OAuth2 Refresh Token"
+              readOnly
+              placeholder="Gerado automaticamente ao conectar"
             />
           </div>
 
           <div className="api-actions">
-            <a href="https://console.cloud.google.com/" target="_blank" className="docs-link">
+            {ytClientId && ytClientSecret ? (
+              <GoogleOAuthProvider clientId={ytClientId}>
+                <YoutubeConnectButton 
+                  clientId={ytClientId} 
+                  clientSecret={ytClientSecret}
+                  onTokensReceived={(token) => {
+                    setYtRefreshToken(token);
+                    setHasChanges(true);
+                    alert('YouTube conectado com sucesso! Clique em Salvar.');
+                  }}
+                />
+              </GoogleOAuthProvider>
+            ) : (
+               <button className="yt-connect-btn" disabled title="Preencha o Client ID e Secret primeiro" type="button">
+                 Conectar YouTube
+               </button>
+            )}
+            <a href="https://console.cloud.google.com/" target="_blank" className="docs-link" rel="noreferrer">
               <span>Google Cloud Console</span>
               <ExternalLink size={14} />
             </a>
