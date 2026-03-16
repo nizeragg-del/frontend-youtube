@@ -1,61 +1,75 @@
 .scheduling-page {
   padding: var(--spacing-xl) var(--spacing-lg);
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .scheduling-header {
   margin-bottom: var(--spacing-xl);
+  text-align: left;
 }
 
 .scheduling-header h1 {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 8px;
-  letter-spacing: -1px;
+  margin-bottom: 12px;
+  letter-spacing: -1.5px;
 }
 
-.orange-text {
-  color: var(--color-action-orange);
+.teal-text {
+  color: var(--color-flowyn-teal);
 }
 
 .scheduling-header p {
   color: var(--color-text-secondary);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .scheduling-main-card {
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .automation-status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: rgba(255, 145, 0, 0.05);
-  border: 1px solid rgba(255, 145, 0, 0.1);
+  padding: 24px 32px;
+  background: rgba(29, 194, 182, 0.03);
+  border: 1px solid rgba(29, 194, 182, 0.1);
   border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.automation-status-bar.active {
+  background: rgba(29, 194, 182, 0.08);
+  border-color: rgba(29, 194, 182, 0.3);
+  box-shadow: 0 0 30px rgba(29, 194, 182, 0.05);
 }
 
 .status-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   font-size: 1.1rem;
 }
 
 .status-info strong {
   margin-left: 8px;
+  color: white;
+}
+
+.glow-icon {
+  filter: drop-shadow(0 0 5px var(--color-flowyn-teal));
 }
 
 .toggle-btn {
@@ -65,50 +79,52 @@
   padding: 0;
   display: flex;
   align-items: center;
-  transition: transform 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .toggle-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .toggle-btn.active {
-  color: var(--color-action-orange);
+  color: var(--color-flowyn-teal);
 }
 
 .scheduling-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 32px;
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .input-group label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
+  gap: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-text-secondary);
 }
 
 .flowyn-input {
-  background: var(--color-bg-primary);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--color-border);
   color: white;
-  padding: 14px;
+  padding: 16px;
   border-radius: var(--radius-sm);
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .flowyn-input:focus {
-  border-color: var(--color-action-orange);
+  border-color: var(--color-flowyn-teal);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(29, 194, 182, 0.1);
 }
 
 .calendar-section {
@@ -118,38 +134,40 @@
 
 .days-selector {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .day-btn {
-  background: var(--color-bg-primary);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
-  padding: 10px 18px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  padding: 12px 22px;
+  border-radius: 30px;
+  font-size: 0.9rem;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .day-btn:hover {
   border-color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.08);
   color: white;
 }
 
 .day-btn.active {
-  background: var(--color-action-orange);
-  border-color: var(--color-action-orange);
-  color: white;
+  background: var(--color-flowyn-teal);
+  border-color: var(--color-flowyn-teal);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(29, 194, 182, 0.3);
 }
 
 .check-icon {
-  animation: scaleIn 0.2s ease-out;
+  animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes scaleIn {
@@ -157,34 +175,84 @@
   to { transform: scale(1); }
 }
 
+.error-banner {
+  background: rgba(239, 51, 73, 0.1);
+  border: 1px solid rgba(239, 51, 73, 0.2);
+  color: var(--color-flowyn-red);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
 .scheduling-footer {
-  margin-top: 12px;
-  padding-top: 24px;
+  margin-top: 20px;
+  padding-top: 32px;
   border-top: 1px solid var(--color-border);
 }
 
 .save-schedule-btn {
   width: 100%;
-  background-color: var(--color-action-orange);
+  background: linear-gradient(135deg, var(--color-flowyn-teal), var(--color-flowyn-blue));
   color: white;
-  padding: 16px;
+  padding: 18px;
   border-radius: var(--radius-md);
   font-weight: 700;
-  font-size: 1rem;
-  box-shadow: 0 4px 15px rgba(255, 145, 0, 0.2);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(15, 115, 173, 0.2);
+  transition: all 0.3s ease;
 }
 
-.save-schedule-btn:hover {
-  background-color: #e68200;
-  transform: translateY(-2px);
+.save-schedule-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(15, 115, 173, 0.3);
+  filter: brightness(1.1);
+}
+
+.save-schedule-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .automation-info {
-  margin-top: 40px;
+  margin-top: 48px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   color: var(--color-text-muted);
-  font-size: 0.85rem;
-  padding: 0 12px;
+  font-size: 0.9rem;
+  padding: 0 20px;
+  line-height: 1.8;
+}
+
+.scheduling-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 20px;
+  color: var(--color-text-secondary);
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Key, Check, AlertTriangle, Save, Youtube } from 'lucide-react';
+import { Shield, Key, Check, AlertTriangle, Save, Youtube, Settings as SettingsIcon, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import './Settings.css';
@@ -137,83 +137,113 @@ const Settings: React.FC = () => {
   const GLOBAL_YT_CLIENT_ID = import.meta.env.VITE_YOUTUBE_CLIENT_ID;
   const GLOBAL_YT_CLIENT_SECRET = import.meta.env.VITE_YOUTUBE_CLIENT_SECRET;
 
-  if (loading) return <div className="settings-container"><p>Carregando configurações...</p></div>;
+  if (loading) return (
+    <div className="settings-container loading-container">
+      <Loader2 size={40} className="animate-spin" />
+      <p>Carregando configurações...</p>
+    </div>
+  );
 
   return (
     <div className="settings-container">
       <header className="page-header">
-        <div>
-          <h1>Configurações de API</h1>
-          <p className="subtitle">Conecte os motores que dão vida aos seus vídeos.</p>
+        <div className="header-content">
+          <div className="header-icon-box">
+            <SettingsIcon size={32} />
+          </div>
+          <div className="header-text">
+            <h1>Configurações de API</h1>
+            <p className="subtitle">Conecte os motores que dão vida aos seus vídeos automáticos.</p>
+          </div>
         </div>
       </header>
 
       <div className="apis-grid">
         {/* Manus AI */}
-        <div className="api-card serene-card">
+        <div className="api-card premium-card teal-border">
+          <div className="card-glow teal-glow"></div>
           <div className="api-header">
             <div className="api-info">
-              <Shield size={24} className="api-icon" />
-              <h3>Manus AI</h3>
+              <div className="icon-circle teal-bg">
+                <Shield size={24} />
+              </div>
+              <div className="title-group">
+                <h3>Manus AI</h3>
+                <p className="api-desc">Motor de roteiros e imagens</p>
+              </div>
             </div>
-            <div className={`status-label ${manusKey ? 'connected' : 'error'}`}>
-              {manusKey ? <Check size={14} /> : <AlertTriangle size={14} />}
-              {manusKey ? 'Configurado' : 'Ação Necessária'}
+            <div className={`status-badge ${manusKey ? 'connected' : 'error'}`}>
+              {manusKey ? 'Ativo' : 'Pendente'}
             </div>
           </div>
-          <p className="api-desc">Geração de roteiros e imagens via IA.</p>
+          
           <div className="form-group">
             <label><Key size={14} /> Chave da API</label>
-            <input 
-              type="password" 
-              className="serene-input" 
-              value={manusKey}
-              onChange={(e) => { setManusKey(e.target.value); setHasChanges(true); }}
-              placeholder="sk-..."
-            />
+            <div className="input-with-icon">
+              <input 
+                type="password" 
+                className="premium-input" 
+                value={manusKey}
+                onChange={(e) => { setManusKey(e.target.value); setHasChanges(true); }}
+                placeholder="sk-..."
+              />
+              {manusKey && <Check size={16} className="valid-icon" />}
+            </div>
           </div>
         </div>
 
         {/* Typecast AI */}
-        <div className="api-card serene-card">
+        <div className="api-card premium-card blue-border">
+          <div className="card-glow blue-glow"></div>
           <div className="api-header">
             <div className="api-info">
-              <Shield size={24} className="api-icon" />
-              <h3>Typecast AI</h3>
+              <div className="icon-circle blue-bg">
+                <Shield size={24} />
+              </div>
+              <div className="title-group">
+                <h3>Typecast AI</h3>
+                <p className="api-desc">Narração realista premium</p>
+              </div>
             </div>
-            <div className={`status-label ${typecastKey ? 'connected' : 'error'}`}>
-              {typecastKey ? <Check size={14} /> : <AlertTriangle size={14} />}
-              {typecastKey ? 'Configurado' : 'Ação Necessária'}
+            <div className={`status-badge ${typecastKey ? 'connected' : 'error'}`}>
+              {typecastKey ? 'Ativo' : 'Pendente'}
             </div>
           </div>
-          <p className="api-desc">Narração realista com vozes premium.</p>
+          
           <div className="form-group">
             <label><Key size={14} /> Chave da API</label>
-            <input 
-              type="password" 
-              className="serene-input" 
-              value={typecastKey}
-              onChange={(e) => { setTypecastKey(e.target.value); setHasChanges(true); }}
-              placeholder="Paste your key here"
-            />
+            <div className="input-with-icon">
+              <input 
+                type="password" 
+                className="premium-input" 
+                value={typecastKey}
+                onChange={(e) => { setTypecastKey(e.target.value); setHasChanges(true); }}
+                placeholder="Insira sua chave aqui"
+              />
+              {typecastKey && <Check size={16} className="valid-icon" />}
+            </div>
           </div>
         </div>
 
         {/* YouTube API */}
-        <div className="api-card serene-card youtube-card">
+        <div className="api-card premium-card red-border youtube-card">
+          <div className="card-glow red-glow"></div>
           <div className="api-header">
             <div className="api-info">
-              <Youtube size={24} className="api-icon youtube" />
-              <h3>YouTube Automation</h3>
+              <div className="icon-circle red-bg">
+                <Youtube size={24} />
+              </div>
+              <div className="title-group">
+                <h3>YouTube Automation</h3>
+                <p className="api-desc">Publicação de Shorts</p>
+              </div>
             </div>
-            <div className={`status-label ${ytRefreshToken ? 'connected' : 'error'}`}>
-              {ytRefreshToken ? <Check size={14} /> : <AlertTriangle size={14} />}
+            <div className={`status-badge ${ytRefreshToken ? 'connected' : 'error'}`}>
               {ytRefreshToken ? 'Conectado' : 'Desconectado'}
             </div>
           </div>
-          <p className="api-desc">Publicação automática de Shorts.</p>
           
-          <div className="api-actions" style={{ marginTop: '20px' }}>
+          <div className="yt-actions-container">
             {GLOBAL_YT_CLIENT_ID && GLOBAL_YT_CLIENT_SECRET ? (
               <GoogleOAuthProvider clientId={GLOBAL_YT_CLIENT_ID}>
                 <YoutubeConnectButton 
@@ -226,24 +256,33 @@ const Settings: React.FC = () => {
                 />
               </GoogleOAuthProvider>
             ) : (
-               <div className="error-box" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e74c3c', fontSize: '0.9rem' }}>
+               <div className="api-error-box">
                  <AlertTriangle size={18} />
-                 <span>Configurações globais de API ausentes.</span>
+                 <span>Configurações globais ausentes no servidor.</span>
                </div>
             )}
           </div>
         </div>
       </div>
 
-      {hasChanges && (
-        <div className="save-bar serene-card glass-accent">
-          <p>Você tem alterações não salvas.</p>
-          <button className="save-btn" onClick={() => saveConfigs()} disabled={saving}>
-            {saving ? 'Salvando...' : 'Salvar Todas as Configurações'}
-            <Save size={18} />
+      <div className={`floating-save-bar ${hasChanges ? 'visible' : ''}`}>
+        <div className="save-bar-content glass-effect">
+          <div className="save-bar-text">
+            <h4>Alterações detectadas</h4>
+            <p>Salve para aplicar as novas chaves ao motor.</p>
+          </div>
+          <button className="premium-save-btn" onClick={() => saveConfigs()} disabled={saving}>
+            {saving ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                <span>Salvar Tudo</span>
+                <Save size={18} />
+              </>
+            )}
           </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

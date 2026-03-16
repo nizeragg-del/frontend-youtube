@@ -1,20 +1,25 @@
 :root {
   /* Core Colors - Flowyn Dark Theme */
-  --color-bg-primary: #0A0A0A;
-  --color-bg-secondary: #161616;
-  --color-surface: #1A1A1A;
+  --color-bg-primary: #050505;
+  --color-bg-secondary: #0D0D0D;
+  --color-surface: #121212;
   
-  /* Action Colors from User Reference */
-  --color-flowyn-red: #FF4B4B;    /* Logo/Branding */
-  --color-action-orange: #FF9100; /* Navigation/Pages */
-  --color-history-blue: #2D9AFF;  /* History Section */
+  /* New Brand Colors */
+  --color-flowyn-teal: #1DC2B6;
+  --color-flowyn-blue: #0F73AD;
+  --color-flowyn-red: #EF3349;
+  
+  /* Legacy/Semantic Mapping */
+  --color-action-primary: var(--color-flowyn-teal);
+  --color-action-secondary: var(--color-flowyn-blue);
+  --color-accent: var(--color-flowyn-red);
   
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #A0A0A0;
-  --color-text-muted: #666666;
+  --color-text-secondary: #B0B0B0;
+  --color-text-muted: #606060;
   
-  --color-border: #2A2A2A;
-  --color-shadow: rgba(0, 0, 0, 0.4);
+  --color-border: #1F1F1F;
+  --color-shadow: rgba(0, 0, 0, 0.6);
   
   /* Spacing */
   --spacing-sm: 0.5rem;
@@ -23,9 +28,9 @@
   --spacing-xl: 3rem;
   
   /* Radii */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
 }
 
 * {

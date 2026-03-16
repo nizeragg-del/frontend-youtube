@@ -93,17 +93,22 @@ const Home = () => {
   return (
     <div className="hero-page">
       <header className="hero-header">
-        <h1 className="hero-title">O que vamos criar hoje?</h1>
+        <div className="brand-badge">Flowyn AI</div>
+        <h1 className="hero-title">O que vamos criar <span className="text-gradient">hoje?</span></h1>
         <p className="hero-subtitle">
-          Transforme passagens bíblicas e mensagens de fé em vídeos inspiradores.
+          Transforme passagens bíblicas e mensagens de fé em vídeos inspiradores com o poder da inteligência artificial.
         </p>
       </header>
 
       <section className="prompt-section">
         <div className="prompt-container">
+          <div className="prompt-header">
+            <Sparkles size={16} className="sparkle-icon" />
+            <span>Novo Projeto</span>
+          </div>
           <div className="prompt-input-area">
             <textarea 
-              placeholder="Descreva o tema, o versículo ou a mensagem... Ex: 'Vídeo sobre o Salmo 23 com imagens de natureza'."
+              placeholder="Descreva o tema, o versículo ou a mensagem... Ex: 'Mensagem de esperança baseada em Romanos 15:13'."
               value={prompt}
               onChange={(e) => {
                 setPrompt(e.target.value);
@@ -115,22 +120,24 @@ const Home = () => {
 
           <div className="prompt-actions">
             <div className="action-icons">
-              <button className="tool-btn"><Mic size={18} /></button>
-              <button className="tool-btn"><ImageIcon size={18} /></button>
-              <button className="tool-btn"><Video size={18} /></button>
-              <button className="tool-btn"><Sparkles size={18} className="sparkle-icon" /></button>
+              <button className="tool-btn teal-hover" title="Gravar Áudio"><Mic size={18} /></button>
+              <button className="tool-btn blue-hover" title="Enviar Imagem"><ImageIcon size={18} /></button>
+              <button className="tool-btn red-hover" title="Adicionar Vídeo"><Video size={18} /></button>
             </div>
             
             <button 
-              className="generate-btn" 
+              className={`generate-btn ${loading ? 'loading' : ''}`}
               onClick={handleGenerate}
               disabled={loading}
             >
               {loading ? (
-                <Loader2 size={18} className="animate-spin" />
+                <div className="loader-container">
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>Iniciando...</span>
+                </div>
               ) : (
                 <>
-                  <span>Gerar</span>
+                  <span>Criar Vídeo</span>
                   <Send size={16} />
                 </>
               )}
@@ -139,21 +146,24 @@ const Home = () => {
         </div>
 
         {error && (
-          <div className="error-message">
+          <div className="error-message shake">
             <AlertCircle size={16} />
             <span>{error}</span>
             {error.includes("Configurações") && (
-              <button onClick={() => navigate('/configuracoes')} className="link-btn">Configurações</button>
+              <button onClick={() => navigate('/configuracoes')} className="link-btn">Ajustar Agora</button>
             )}
           </div>
         )}
 
-        <div className="suggestions-grid">
-          {suggestions.map((s, i) => (
-            <button key={i} className="suggestion-pill" onClick={() => setPrompt(s)}>
-              {s}
-            </button>
-          ))}
+        <div className="suggestions-container">
+          <span className="suggestions-label">Sugestões para você</span>
+          <div className="suggestions-grid">
+            {suggestions.map((s, i) => (
+              <button key={i} className="suggestion-pill" onClick={() => setPrompt(s)}>
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="features-badges">

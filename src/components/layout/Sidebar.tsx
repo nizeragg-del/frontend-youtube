@@ -1,20 +1,21 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { MessageSquare, Calendar, Settings, LogOut, Zap, Clock, ChevronRight } from 'lucide-react';
+import { MessageSquare, Calendar, Settings, LogOut, Clock, ChevronRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useState, useEffect } from 'react';
 import './Sidebar.css';
+import logo from '../../../logo.png';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [history, setHistory] = useState<any[]>([]);
 
   useEffect(() => {
-    // Mock data for now, will connect to DB later if table exists
+    // Mock data for now
     setHistory([
-      { id: '1', title: 'Generate a Cinematic Image on Bibl...', status: 'complete', count: 0 },
-      { id: '2', title: 'Generate High-Quality Cinem...', status: 'complete', count: 2 },
-      { id: '3', title: 'Generate Cinematic Image fro...', status: 'complete', count: 3 },
-      { id: '4', title: 'Generate Cinematic Image Ba...', status: 'complete', count: 2 },
+      { id: '1', title: 'Mensagem motivacional de Ro...', status: 'complete', count: 0 },
+      { id: '2', title: 'Estudo visual sobre Parábo...', status: 'complete', count: 2 },
+      { id: '3', title: 'Explicação do Salmo 23 con...', status: 'complete', count: 3 },
+      { id: '4', title: 'Vídeo curto do Versículo do...', status: 'complete', count: 2 },
     ]);
   }, []);
 
@@ -26,35 +27,33 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="logo-icon-container">
-          <Zap size={24} fill="currentColor" />
-        </div>
+        <img src={logo} alt="Flowyn Logo" className="brand-logo" />
         <div className="logo-text-group">
           <span className="logo-text">flowyn</span>
-          <span className="logo-subtitle">Automação</span>
+          <span className="logo-subtitle">IA AUTOMAÇÃO</span>
         </div>
       </div>
       
-      <div className="sidebar-section-label orange">Projetos</div>
+      <div className="sidebar-section-label">PROJETOS</div>
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({ isActive }) => `nav-item orange-nav ${isActive ? 'active' : ''}`}>
-          <MessageSquare size={18} />
+        <NavLink to="/" className={({ isActive }) => `nav-item teal-nav ${isActive ? 'active' : ''}`}>
+          <MessageSquare size={20} />
           <span>Início / Chat</span>
         </NavLink>
         
-        <NavLink to="/agendamentos" className={({ isActive }) => `nav-item orange-nav ${isActive ? 'active' : ''}`}>
-          <Calendar size={18} />
+        <NavLink to="/agendamentos" className={({ isActive }) => `nav-item blue-nav ${isActive ? 'active' : ''}`}>
+          <Calendar size={20} />
           <span>Agendamentos</span>
         </NavLink>
         
-        <NavLink to="/configuracoes" className={({ isActive }) => `nav-item orange-nav ${isActive ? 'active' : ''}`}>
-          <Settings size={18} />
+        <NavLink to="/configuracoes" className={({ isActive }) => `nav-item red-nav ${isActive ? 'active' : ''}`}>
+          <Settings size={20} />
           <span>Configurações API</span>
         </NavLink>
       </nav>
 
       <div className="sidebar-history-container">
-        <div className="sidebar-section-label blue">Todas as tarefas</div>
+        <div className="sidebar-section-label blue-fade">TODAS AS TAREFAS</div>
         <div className="history-list">
           {history.map((item) => (
             <div key={item.id} className="history-item">
