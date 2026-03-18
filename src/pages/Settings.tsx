@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Shield, Key, Check, AlertTriangle, Save, Youtube, Settings as SettingsIcon, Loader2, Play, Pause, User, Volume2, Eye, EyeOff } from 'lucide-react';
+import { Shield, Key, AlertTriangle, Save, Youtube, Loader2, Play, Pause, User, Volume2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import './Settings.css';

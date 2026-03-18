@@ -1,4 +1,4 @@
-import { Zap, Globe, Layout, Calendar as CalendarIcon, Check, Save, Loader2, AlertCircle, User, Play, Pause, ChevronRight } from 'lucide-react';
+import { Zap, Globe, Layout, Check, Save, Loader2, User, Play, Pause, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import './Scheduling.css';
