@@ -34,6 +34,7 @@ const Scheduling: React.FC = () => {
   const [theme, setTheme] = useState('');
   const [language, setLanguage] = useState(LANGUAGES[0]);
   const [selectedVoice, setSelectedVoice] = useState(VOICES_BY_LANGUAGE[LANGUAGES[0]][0].id);
+  const [speechSpeed, setSpeechSpeed] = useState(1.0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +66,7 @@ const Scheduling: React.FC = () => {
         setTheme(data.script_theme || '');
         setLanguage(data.voice_language || 'Português');
         if (data.voice_id) setSelectedVoice(data.voice_id);
+        if (data.speech_speed) setSpeechSpeed(data.speech_speed);
       }
     } catch (err: any) {
       console.error('Erro ao carregar agendamento:', err);
@@ -90,6 +92,7 @@ const Scheduling: React.FC = () => {
           script_theme: theme,
           voice_language: language,
           voice_id: selectedVoice,
+          speech_speed: speechSpeed,
           updated_at: new Date().toISOString()
         });
 
@@ -227,6 +230,33 @@ const Scheduling: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+              <div className="speed-selection-box" style={{ marginTop: '20px', marginBottom: '20px', background: '#fcfcfc', padding: '16px', borderRadius: '12px', border: '1px solid #f0f0f0' }}>
+                 <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                   <span>Velocidade da Voz</span>
+                   <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{speechSpeed.toFixed(2)}x</span>
+                 </label>
+                 <input 
+                   type="range" 
+                   min="0.5" 
+                   max="2.0" 
+                   step="0.05" 
+                   value={speechSpeed} 
+                   onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
+                   style={{ 
+                     width: '100%', 
+                     accentColor: 'var(--primary)',
+                     height: '6px',
+                     borderRadius: '4px',
+                     cursor: 'pointer'
+                   }}
+                 />
+                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#888', marginTop: '8px', fontWeight: 500 }}>
+                    <span>0.5x (Lento)</span>
+                    <span>1.0x (Normal)</span>
+                    <span>2.0x (Rápido)</span>
+                 </div>
+              </div>
 
               <div className="calendar-box">
                  <label className="input-label">Dias de Geração</label>
