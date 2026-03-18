@@ -1,16 +1,30 @@
-import { Zap, Globe, Layout, Calendar as CalendarIcon, ToggleLeft, ToggleRight, Check, Save, Loader2, AlertCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Zap, Globe, Layout, Calendar as CalendarIcon, ToggleLeft, ToggleRight, Check, Save, Loader2, AlertCircle, Volume2, User, Play, Pause } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import './Scheduling.css';
+
+const VOICES = [
+  { id: 'tc_5f8d7b0de146f10007b8042f', name: 'Camila', gender: 'Feminino', desc: 'Narradora calma e inspiradora.', preview: '/assets/previews/camila.mp3' },
+  { id: 'tc_61b9a899a28a0b3f64b21d4f', name: 'Carlos', gender: 'Masculino', desc: 'Voz robusta e versátil.', preview: '/assets/previews/carlos.mp3' },
+  { id: 'tc_6777669145604e14c7ff8f03', name: 'Victoria', gender: 'Feminino', desc: 'Tom profissional e suave.', preview: '/assets/previews/victoria.mp3' },
+  { id: 'tc_6837b58f80ceeb17115bb771', name: 'Walter', gender: 'Masculino', desc: 'Voz madura e confiável.', preview: '/assets/previews/walter.mp3' },
+  { id: 'tc_684a5a7ba2ce934624b59c6e', name: 'Nia', gender: 'Feminino', desc: 'Voz jovem e energética.', preview: '/assets/previews/nia.mp3' },
+  { id: 'tc_686dc45bbd6351e06ee64daf', name: 'Elise', gender: 'Feminino', desc: 'Narração acolhedora.', preview: '/assets/previews/elise.mp3' }
+];
+
+const LANGUAGES = ['Português', 'Inglês', 'Espanhol', 'Francês', 'Alemão'];
 
 const Scheduling: React.FC = () => {
   const [automationActive, setAutomationActive] = useState(false);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [theme, setTheme] = useState('');
-  const [language, setLanguage] = useState('Português');
+  const [language, setLanguage] = useState(LANGUAGES[0]);
+  const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Dom'];
 
@@ -37,7 +51,8 @@ const Scheduling: React.FC = () => {
         setAutomationActive(isActive);
         setSelectedDays(data.schedule_days || []);
         setTheme(data.script_theme || '');
-        setLanguage(data.script_language || 'Português');
+        setLanguage(data.voice_language || 'Português');
+        if (data.voice_id) setSelectedVoice(data.voice_id);
       }
     } catch (err: any) {
       console.error('Erro ao carregar agendamento:', err);
@@ -67,7 +82,8 @@ const Scheduling: React.FC = () => {
           // Actually, let's just keep 'automation_active' and fix the UI first.
           schedule_days: selectedDays,
           script_theme: theme,
-          script_language: language,
+          voice_language: language,
+          voice_id: selectedVoice,
           updated_at: new Date().toISOString()
         });
 
@@ -128,16 +144,53 @@ const Scheduling: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label><Globe size={18} /> Linguagem do Áudio/Roteiro</label>
+            <label><Globe size={18} /> Idioma da Narração</label>
             <select 
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
               className="flowyn-input"
             >
-              <option>Português</option>
-              <option>English</option>
-              <option>Español</option>
+              {LANGUAGES.map(lang => <option key={lang}>{lang}</option>)}
             </select>
+          </div>
+
+          <div className="voice-gallery-section">
+            <label><Volume2 size={18} /> Escolher Narrador</label>
+            <div className="voice-gallery-mini">
+              {VOICES.map((voice) => (
+                <div 
+                  key={voice.id} 
+                  className={`voice-card-mini ${selectedVoice === voice.id ? 'active' : ''}`}
+                  onClick={() => setSelectedVoice(voice.id)}
+                >
+                   <div className="voice-mini-info">
+                      <div className={`mini-avatar ${voice.gender === 'Feminino' ? 'pink' : 'blue'}`}>
+                        <User size={14} />
+                      </div>
+                      <span>{voice.name}</span>
+                   </div>
+                   <button 
+                     className="mini-preview-btn"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       if (playingVoice === voice.id) {
+                         audioRef.current?.pause();
+                         setPlayingVoice(null);
+                       } else {
+                         if (audioRef.current) audioRef.current.pause();
+                         const audio = new Audio(voice.preview);
+                         audio.onended = () => setPlayingVoice(null);
+                         audio.play();
+                         audioRef.current = audio;
+                         setPlayingVoice(voice.id);
+                       }
+                     }}
+                   >
+                     {playingVoice === voice.id ? <Pause size={14} /> : <Play size={14} />}
+                   </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="calendar-section">

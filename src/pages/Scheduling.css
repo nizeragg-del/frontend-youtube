@@ -77,6 +77,84 @@
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.input-group select {
+  cursor: pointer;
+}
+
+/* Voice Gallery Mini */
+.voice-gallery-section {
+  margin-top: 24px;
+}
+
+.voice-gallery-mini {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.voice-card-mini {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.voice-card-mini:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 191, 191, 0.3);
+}
+
+.voice-card-mini.active {
+  background: rgba(0, 191, 191, 0.1);
+  border-color: var(--color-teal);
+  box-shadow: 0 0 15px rgba(0, 191, 191, 0.2);
+}
+
+.voice-mini-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-avatar.pink { background: rgba(255, 105, 180, 0.2); color: #ff69b4; }
+.mini-avatar.blue { background: rgba(0, 191, 255, 0.2); color: #00bfff; }
+
+.mini-preview-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mini-preview-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+.toggle-btn {
   padding: 0;
   display: flex;
   align-items: center;
