@@ -3,14 +3,28 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import './Scheduling.css';
 
-const VOICES = [
-  { id: 'tc_5f8d7b0de146f10007b8042f', name: 'Camila', gender: 'Feminino', preview: '/assets/previews/camila.mp3' },
-  { id: 'tc_61b9a899a28a0b3f64b21d4f', name: 'Carlos', gender: 'Masculino', preview: '/assets/previews/carlos.mp3' },
-  { id: 'tc_6777669145604e14c7ff8f03', name: 'Victoria', gender: 'Feminino', preview: '/assets/previews/victoria.mp3' },
-  { id: 'tc_6837b58f80ceeb17115bb771', name: 'Walter', gender: 'Masculino', preview: '/assets/previews/walter.mp3' },
-  { id: 'tc_684a5a7ba2ce934624b59c6e', name: 'Nia', gender: 'Feminino', preview: '/assets/previews/nia.mp3' },
-  { id: 'tc_686dc45bbd6351e06ee64daf', name: 'Elise', gender: 'Feminino', preview: '/assets/previews/elise.mp3' }
-];
+const VOICES_BY_LANGUAGE: Record<string, any[]> = {
+  'Português': [
+    { id: 'tc_5f8d7b0de146f10007b8042f', name: 'Camila', gender: 'Feminino', preview: '/assets/previews/camila.mp3' },
+    { id: 'tc_61a1a72d4ecbefd29fb44383', name: 'Gabriel', gender: 'Masculino', preview: '/assets/previews/gabriel.mp3' },
+  ],
+  'Inglês': [
+    { id: 'tc_6777669145604e14c7ff8f03', name: 'Victoria', gender: 'Feminino', preview: '/assets/previews/victoria.mp3' },
+    { id: 'tc_6837b58f80ceeb17115bb771', name: 'Walter', gender: 'Masculino', preview: '/assets/previews/walter.mp3' },
+  ],
+  'Espanhol': [
+    { id: 'tc_5fe06471a9f79e8f959be96f', name: 'Julia', gender: 'Feminino', preview: '/assets/previews/julia.mp3' },
+    { id: 'tc_61b9a899a28a0b3f64b21d4f', name: 'Carlos', gender: 'Masculino', preview: '/assets/previews/carlos.mp3' },
+  ],
+  'Francês': [
+    { id: 'tc_686dc45bbd6351e06ee64daf', name: 'Elise', gender: 'Feminino', preview: '/assets/previews/elise.mp3' },
+    { id: 'tc_68ef0674d8af7548a74e5428', name: 'Gerard', gender: 'Masculino', preview: '/assets/previews/gerard.mp3' },
+  ],
+  'Alemão': [
+    { id: 'tc_684a5a7ba2ce934624b59c6e', name: 'Nia', gender: 'Feminino', preview: '/assets/previews/nia.mp3' },
+    { id: 'tc_624ccc5a6ac2f03235ce042b', name: 'Hans', gender: 'Masculino', preview: '/assets/previews/hans.mp3' },
+  ]
+};
 
 const LANGUAGES = ['Português', 'Inglês', 'Espanhol', 'Francês', 'Alemão'];
 
@@ -19,7 +33,7 @@ const Scheduling: React.FC = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [theme, setTheme] = useState('');
   const [language, setLanguage] = useState(LANGUAGES[0]);
-  const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id);
+  const [selectedVoice, setSelectedVoice] = useState(VOICES_BY_LANGUAGE[LANGUAGES[0]][0].id);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -169,16 +183,25 @@ const Scheduling: React.FC = () => {
                  </div>
                  <div className="form-group">
                     <label><Globe size={16} /> Idioma Oficial</label>
-                    <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                    <select 
+                      value={language} 
+                      onChange={(e) => {
+                        const newLang = e.target.value;
+                        setLanguage(newLang);
+                        if (VOICES_BY_LANGUAGE[newLang]) {
+                          setSelectedVoice(VOICES_BY_LANGUAGE[newLang][0].id);
+                        }
+                      }}
+                    >
                        {LANGUAGES.map(l => <option key={l}>{l}</option>)}
                     </select>
                  </div>
               </div>
 
-              <div className="voice-selection-box">
-                 <label className="input-label">Selecionar Narrador</label>
-                 <div className="voice-cards-grid">
-                    {VOICES.map(voice => (
+                <div className="voice-selection-box">
+                  <label className="input-label">Selecionar Narrador ({language})</label>
+                  <div className="voice-cards-grid">
+                    {(VOICES_BY_LANGUAGE[language] || []).map(voice => (
                       <div 
                         key={voice.id} 
                         className={`modern-voice-card ${selectedVoice === voice.id ? 'selected' : ''}`}
@@ -202,8 +225,8 @@ const Scheduling: React.FC = () => {
                          {selectedVoice === voice.id && <div className="selected-dot"><Check size={10} /></div>}
                       </div>
                     ))}
-                 </div>
-              </div>
+                  </div>
+                </div>
 
               <div className="calendar-box">
                  <label className="input-label">Dias de Geração</label>
