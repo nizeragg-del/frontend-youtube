@@ -3,7 +3,7 @@
   padding: 40px 0;
   background-color: var(--color-bg-primary);
   border-top: 1px solid var(--color-border);
-  margin-top: 60px;
+  margin-top: auto;
 }
 
 .footer-container {
@@ -13,12 +13,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--spacing-lg);
+  padding: 0 40px;
 }
 
 .copyright {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
+  font-weight: 500;
 }
 
 .footer-center {
@@ -28,13 +29,14 @@
 
 .footer-center a {
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
-  transition: color 0.2s;
+  transition: all 0.2s;
+  font-weight: 500;
 }
 
 .footer-center a:hover {
-  color: var(--color-text-secondary);
+  color: var(--color-blue);
 }
 
 .footer-right {
@@ -46,21 +48,26 @@
 .footer-icon-btn {
   background: transparent;
   color: var(--color-text-muted);
-  padding: 4px;
+  transition: color 0.2s;
+}
+
+.footer-icon-btn:hover {
+  color: var(--color-blue);
 }
 
 .footer-language {
-  background: transparent;
-  color: var(--color-text-muted);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .globe-icon-placeholder {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--color-border);
+  display: none;
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
@@ -49,100 +49,90 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-page">
-      <div className="login-card serene-card glass-effect">
-        <div className="login-header">
-          <div className="logo-section">
-            <img src={logo} alt="Flowyn Logo" className="login-brand-logo" />
+      <div className="login-container">
+        <div className="login-card-modern serene-card">
+          <header className="login-header">
+            <img src={logo} alt="Flowyn Logo" className="login-logo-img" />
+            <h1 className="login-title">{isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}</h1>
+            <p className="login-subtitle">A plataforma de IA para vídeos virais.</p>
+          </header>
+
+          <div className="auth-tabs">
+            <button className={`auth-tab ${isLogin ? 'active' : ''}`} onClick={() => setIsLogin(true)}>Entrar</button>
+            <button className={`auth-tab ${!isLogin ? 'active' : ''}`} onClick={() => setIsLogin(false)}>Cadastrar</button>
           </div>
-          <p className="login-subtitle">Transforme sua fé em conteúdo inspirador.</p>
-        </div>
 
-        <div className="tabs">
-          <button 
-            className={`tab ${isLogin ? 'active' : ''}`} 
-            onClick={() => { setIsLogin(true); setError(null); }}
-          >
-            Entrar
-          </button>
-          <button 
-            className={`tab ${!isLogin ? 'active' : ''}`} 
-            onClick={() => { setIsLogin(false); setError(null); }}
-          >
-            Criar Conta
-          </button>
-        </div>
+          <form className="auth-form" onSubmit={handleAuth}>
+            {error && (
+              <div className="auth-error-box">
+                <AlertCircle size={16} />
+                <span>{error}</span>
+              </div>
+            )}
 
-        <form className="login-form" onSubmit={handleAuth}>
-          {error && (
-            <div className="error-message auth-error">
-              <AlertCircle size={16} />
-              <span>{error}</span>
-            </div>
-          )}
+            {!isLogin && (
+              <div className="modern-input-group">
+                <label>Nome Completo</label>
+                <div className="input-field-wrapper">
+                  <User size={18} className="field-icon" />
+                  <input 
+                    type="text" 
+                    placeholder="Seu nome" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+              </div>
+            )}
 
-          {!isLogin && (
-            <div className="form-group">
-              <label>Nome Completo</label>
-              <div className="input-with-icon">
+            <div className="modern-input-group">
+              <label>E-mail</label>
+              <div className="input-field-wrapper">
+                <Mail size={18} className="field-icon" />
                 <input 
-                  type="text" 
-                  placeholder="Seu nome" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required={!isLogin}
+                  type="email" 
+                  placeholder="exemplo@email.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
             </div>
-          )}
 
-          <div className="form-group">
-            <label>Email</label>
-            <div className="input-with-icon">
-              <Mail size={18} />
-              <input 
-                type="email" 
-                placeholder="exemplo@email.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <div className="modern-input-group">
+              <label>Senha</label>
+              <div className="input-field-wrapper">
+                <Lock size={18} className="field-icon" />
+                <input 
+                  type="password" 
+                  placeholder="********" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label>Senha</label>
-            <div className="input-with-icon">
-              <Lock size={18} />
-              <input 
-                type="password" 
-                placeholder="••••••••" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+            <button className="auth-submit-btn" type="submit" disabled={loading}>
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  <span>{isLogin ? 'Entrar no Hub' : 'Iniciar agora'}</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
 
-          <button className="login-btn" type="submit" disabled={loading}>
-            {loading ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <>
-                <span>{isLogin ? 'Entrar no Painel' : 'Criar minha conta'}</span>
-                <ArrowRight size={18} />
-              </>
-            )}
-          </button>
-        </form>
-
-        {isLogin && (
-          <div className="login-footer">
-            <button className="link-btn">Esqueceu sua senha?</button>
-          </div>
-        )}
+          {isLogin && <button className="forgot-password-link">Esqueci minha senha</button>}
+        </div>
+        
+        <footer className="login-footer-text">
+          <p>© 2024 Flowyn AI. Estúdio de Geração Inteligente.</p>
+        </footer>
       </div>
-      
-      <p className="page-footer-text">© 2024 Flowyn IA - Tecnologia a serviço da Palavra.</p>
     </div>
   );
 };

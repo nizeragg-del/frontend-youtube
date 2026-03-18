@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, Sparkles, Mic, Image as ImageIcon, Video, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Sparkles, Loader2, AlertCircle, Plus, Zap, History } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
@@ -11,16 +11,9 @@ const Home = () => {
   const navigate = useNavigate();
 
   const suggestions = [
-    "Mensagem motivacional de Romanos 15:13",
-    "Vídeo curto do Versículo do Dia",
-    "Estudo visual sobre Parábolas",
-    "Explicação do Salmo 23"
-  ];
-
-  const features = [
-    "Qualidade 4K",
-    "Narração Realista",
-    "Legendas Automáticas"
+    { text: "Curiosidade sobre o espaço", icon: <Zap size={14} /> },
+    { text: "Mensagem de fé (Salmo 23)", icon: <Sparkles size={14} /> },
+    { text: "História Bíblica de Davi", icon: <History size={14} /> }
   ];
 
   const handleGenerate = async () => {
@@ -93,90 +86,67 @@ const Home = () => {
   };
 
   return (
-    <div className="hero-page">
-      <header className="hero-header">
-        <div className="brand-badge">Flowyn AI</div>
-        <h1 className="hero-title">O que vamos criar <span className="text-gradient">hoje?</span></h1>
-        <p className="hero-subtitle">
-          Transforme passagens bíblicas e mensagens de fé em vídeos inspiradores com o poder da inteligência artificial.
-        </p>
-      </header>
+    <div className="home-container">
+      <main className="home-content">
+        <header className="home-header">
+          <h1 className="home-title">Olá! O que vamos criar hoje?</h1>
+          <p className="home-subtitle">Crie vídeos virais com IA em segundos.</p>
+        </header>
 
-      <section className="prompt-section">
-        <div className="prompt-container">
-          <div className="prompt-header">
-            <Sparkles size={16} className="sparkle-icon" />
-            <span>Novo Projeto</span>
-          </div>
-          <div className="prompt-input-area">
-            <textarea 
-              placeholder="Descreva o tema, o versículo ou a mensagem... Ex: 'Mensagem de esperança baseada em Romanos 15:13'."
-              value={prompt}
-              onChange={(e) => {
-                setPrompt(e.target.value);
-                if (error) setError(null);
-              }}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="prompt-actions">
-            <div className="action-icons">
-              <button className="tool-btn teal-hover" title="Gravar Áudio"><Mic size={18} /></button>
-              <button className="tool-btn blue-hover" title="Enviar Imagem"><ImageIcon size={18} /></button>
-              <button className="tool-btn red-hover" title="Adicionar Vídeo"><Video size={18} /></button>
-            </div>
-            
-            <button 
-              className={`generate-btn ${loading ? 'loading' : ''}`}
-              onClick={handleGenerate}
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="loader-container">
-                  <Loader2 size={18} className="animate-spin" />
-                  <span>Iniciando...</span>
-                </div>
-              ) : (
-                <>
-                  <span>Criar Vídeo</span>
-                  <Send size={16} />
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="error-message shake">
-            <AlertCircle size={16} />
-            <span>{error}</span>
-            {error.includes("Configurações") && (
-              <button onClick={() => navigate('/configuracoes')} className="link-btn">Ajustar Agora</button>
-            )}
-          </div>
-        )}
-
-        <div className="suggestions-container">
-          <span className="suggestions-label">Sugestões para você</span>
-          <div className="suggestions-grid">
+        <div className="generation-area">
+          <div className="suggestions-row">
             {suggestions.map((s, i) => (
-              <button key={i} className="suggestion-pill" onClick={() => setPrompt(s)}>
-                {s}
+              <button key={i} className="suggestion-card" onClick={() => setPrompt(s.text)}>
+                <span className="suggestion-icon">{s.icon}</span>
+                <span className="suggestion-text">{s.text}</span>
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="features-badges">
-          {features.map((f, i) => (
-            <div key={i} className="feature-badge">
-              <CheckCircle2 size={14} />
-              <span>{f}</span>
+          <div className="input-pannel">
+            <div className={`pill-input-wrapper ${loading ? 'loading-state' : ''}`}>
+              <Plus className="input-plus-icon" size={20} />
+              <textarea 
+                placeholder="Descreva o tema para gerar um vídeo viral..."
+                value={prompt}
+                onChange={(e) => {
+                  setPrompt(e.target.value);
+                  if (error) setError(null);
+                }}
+                disabled={loading}
+                rows={1}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleGenerate();
+                  }
+                }}
+              />
+              <button 
+                className={`send-button ${prompt.trim() ? 'active' : ''}`}
+                onClick={handleGenerate}
+                disabled={loading || !prompt.trim()}
+              >
+                {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+              </button>
             </div>
-          ))}
+            
+            {error && (
+              <div className="home-error-badge">
+                <AlertCircle size={14} />
+                <span>{error}</span>
+                {error.includes("Configurações") && (
+                  <button onClick={() => navigate('/configuracoes')} className="error-link">Configurar</button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </section>
+      </main>
+      
+      <footer className="home-footer">
+        <p>A Flowyn AI pode cometer erros. Verifique informações importantes.</p>
+      </footer>
     </div>
   );
 };

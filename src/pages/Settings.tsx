@@ -1,31 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { Shield, Key, Check, AlertTriangle, Save, Youtube, Settings as SettingsIcon, Loader2, Play, Pause, User, Volume2 } from 'lucide-react';
+import { Shield, Key, Check, AlertTriangle, Save, Youtube, Settings as SettingsIcon, Loader2, Play, Pause, User, Volume2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import './Settings.css';
 
 const VOICES = [
-  { id: 'tc_5f8d7b0de146f10007b8042f', name: 'Camila', gender: 'Feminino', desc: 'Narradora calma e inspiradora. Ideal para mensagens de fé.', preview: '/assets/previews/camila.mp3' },
-  { id: 'tc_61b9a899a28a0b3f64b21d4f', name: 'Carlos', gender: 'Masculino', desc: 'Voz robusta e versátil para narrações impactantes.', preview: '/assets/previews/carlos.mp3' },
-  { id: 'tc_6777669145604e14c7ff8f03', name: 'Victoria', gender: 'Feminino', desc: 'Tom profissional e suave, excelente para vídeos globais.', preview: '/assets/previews/victoria.mp3' },
-  { id: 'tc_6837b58f80ceeb17115bb771', name: 'Walter', gender: 'Masculino', desc: 'Voz madura e confiável, perfeita para mensagens profundas.', preview: '/assets/previews/walter.mp3' },
-  { id: 'tc_684a5a7ba2ce934624b59c6e', name: 'Nia', gender: 'Feminino', desc: 'Voz jovem e energética para conteúdos dinâmicos.', preview: '/assets/previews/nia.mp3' },
-  { id: 'tc_686dc45bbd6351e06ee64daf', name: 'Elise', gender: 'Feminino', desc: 'Narração acolhedora e amigável.', preview: '/assets/previews/elise.mp3' }
+  { id: 'tc_5f8d7b0de146f10007b8042f', name: 'Camila', gender: 'Feminino', preview: '/assets/previews/camila.mp3' },
+  { id: 'tc_61b9a899a28a0b3f64b21d4f', name: 'Carlos', gender: 'Masculino', preview: '/assets/previews/carlos.mp3' },
+  { id: 'tc_6777669145604e14c7ff8f03', name: 'Victoria', gender: 'Feminino', preview: '/assets/previews/victoria.mp3' },
+  { id: 'tc_6837b58f80ceeb17115bb771', name: 'Walter', gender: 'Masculino', preview: '/assets/previews/walter.mp3' },
+  { id: 'tc_684a5a7ba2ce934624b59c6e', name: 'Nia', gender: 'Feminino', preview: '/assets/previews/nia.mp3' },
+  { id: 'tc_686dc45bbd6351e06ee64daf', name: 'Elise', gender: 'Feminino', preview: '/assets/previews/elise.mp3' }
 ];
 
 const LANGUAGES = ['Português', 'Inglês', 'Espanhol', 'Francês', 'Alemão'];
 
-const YoutubeConnectButton = ({ 
-  clientId, 
-  clientSecret, 
-  onTokensReceived 
-}: { 
-  clientId: string; 
-  clientSecret: string; 
-  onTokensReceived: (token: string) => void;
-}) => {
+const YoutubeConnectButton = ({ clientId, clientSecret, onTokensReceived }: any) => {
   const [loading, setLoading] = useState(false);
-
   const login = useGoogleLogin({
     flow: 'auth-code',
     scope: 'https://www.googleapis.com/auth/youtube.upload',
@@ -44,33 +35,19 @@ const YoutubeConnectButton = ({
           })
         });
         const data = await response.json();
-        if (data.refresh_token) {
-          onTokensReceived(data.refresh_token);
-        } else {
-          console.error("Token response:", data);
-          alert('Não foi possível obter o Refresh Token. Certifique-se de autorizar o aplicativo.');
-        }
+        if (data.refresh_token) onTokensReceived(data.refresh_token);
       } catch (err) {
-        console.error('Erro na troca de código:', err);
         alert('Erro ao conectar ao YouTube.');
       } finally {
         setLoading(false);
       }
-    },
-    onError: errorResponse => {
-      console.error('Login falhou:', errorResponse);
-      alert('Login falhou. Verifique se o Client ID é válido e a URI está autorizada.');
     }
   });
 
   return (
-    <button 
-      className="yt-connect-btn" 
-      onClick={() => login()} 
-      disabled={loading}
-      type="button"
-    >
-      {loading ? 'Conectando...' : 'Conectar YouTube'}
+    <button className="modern-yt-btn" onClick={() => login()} disabled={loading}>
+      <Youtube size={18} />
+      {loading ? 'Conectando...' : 'Conectar Conta do YouTube'}
     </button>
   );
 };
@@ -78,6 +55,8 @@ const YoutubeConnectButton = ({
 const Settings: React.FC = () => {
   const [manusKey, setManusKey] = useState('');
   const [typecastKey, setTypecastKey] = useState('');
+  const [showManus, setShowManus] = useState(false);
+  const [showTypecast, setShowTypecast] = useState(false);
   const [ytRefreshToken, setYtRefreshToken] = useState('');
   const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id);
   const [voiceLanguage, setVoiceLanguage] = useState(LANGUAGES[0]);
@@ -87,21 +66,13 @@ const Settings: React.FC = () => {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    fetchConfigs();
-  }, []);
+  useEffect(() => { fetchConfigs(); }, []);
 
   const fetchConfigs = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      const { data } = await supabase
-        .from('user_configs')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
+      const { data } = await supabase.from('user_configs').select('*').eq('user_id', user.id).single();
       if (data) {
         setManusKey(data.manus_api_key || '');
         setTypecastKey(data.typecast_api_key || '');
@@ -109,280 +80,177 @@ const Settings: React.FC = () => {
         if (data.voice_id) setSelectedVoice(data.voice_id);
         if (data.voice_language) setVoiceLanguage(data.voice_language);
       }
-    } catch (err) {
-      console.error('Erro ao carregar configurações:', err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.error(err); } finally { setLoading(false); }
   };
 
   const saveConfigs = async (newToken?: string) => {
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        alert('Você precisa estar logado para salvar as configurações.');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('user_configs')
-        .upsert({
-          user_id: user.id,
-          manus_api_key: manusKey,
-          typecast_api_key: typecastKey,
-          youtube_refresh_token: newToken || ytRefreshToken,
-          voice_id: selectedVoice,
-          voice_language: voiceLanguage,
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
+      if (!user) return;
+      await supabase.from('user_configs').upsert({
+        user_id: user.id,
+        manus_api_key: manusKey,
+        typecast_api_key: typecastKey,
+        youtube_refresh_token: newToken || ytRefreshToken,
+        voice_id: selectedVoice,
+        voice_language: voiceLanguage,
+        updated_at: new Date().toISOString()
+      });
       setHasChanges(false);
-      if (newToken) {
-        alert('YouTube conectado e salvo com sucesso!');
-      } else {
-        alert('Configurações salvas!');
-      }
-    } catch (err) {
-      console.error('Erro ao salvar:', err);
-      alert('Erro ao salvar as configurações.');
-    } finally {
-      setSaving(false);
-    }
+      alert('Configurações salvas!');
+    } catch (err) { alert('Erro ao salvar.'); } finally { setSaving(false); }
   };
 
-  const togglePreview = (voice: typeof VOICES[0]) => {
+  const togglePreview = (voice: any) => {
     if (playingVoice === voice.id) {
       audioRef.current?.pause();
       setPlayingVoice(null);
     } else {
-      // Parar qualquer áudio anterior
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-
+      if (audioRef.current) audioRef.current.pause();
       const audio = new Audio(voice.preview);
       audio.onended = () => setPlayingVoice(null);
-      audio.onerror = () => {
-        setPlayingVoice(null);
-        alert('Prévia de áudio não encontrada para esta voz.');
-      };
-      audio.play().catch(err => {
-        console.error('Erro ao tocar áudio:', err);
-        setPlayingVoice(null);
-      });
+      audio.play();
       audioRef.current = audio;
       setPlayingVoice(voice.id);
     }
   };
 
-  // Pegamos as chaves globais do ambiente (Vercel/Vite)
   const GLOBAL_YT_CLIENT_ID = import.meta.env.VITE_YOUTUBE_CLIENT_ID;
   const GLOBAL_YT_CLIENT_SECRET = import.meta.env.VITE_YOUTUBE_CLIENT_SECRET;
 
-  if (loading) return (
-    <div className="settings-container loading-container">
-      <Loader2 size={40} className="animate-spin" />
-      <p>Carregando configurações...</p>
-    </div>
-  );
+  if (loading) return <div className="loading-state-full"><Loader2 size={32} className="animate-spin" /></div>;
 
   return (
-    <div className="settings-container">
-      <header className="page-header">
-        <div className="header-content">
-          <div className="header-icon-box">
-            <SettingsIcon size={32} />
-          </div>
-          <div className="header-text">
-            <h1>Configurações de API</h1>
-            <p className="subtitle">Conecte os motores que dão vida aos seus vídeos automáticos.</p>
-          </div>
-        </div>
+    <div className="settings-page">
+      <header className="settings-header">
+        <h1 className="page-title">Configurações Gerais</h1>
+        <p className="page-description">Gerencie suas chaves de API e preferências globais.</p>
       </header>
 
-      <div className="apis-grid">
-        {/* Manus AI */}
-        <div className="api-card premium-card teal-border">
-          <div className="card-glow teal-glow"></div>
-          <div className="api-header">
-            <div className="api-info">
-              <div className="icon-circle teal-bg">
-                <Shield size={24} />
-              </div>
-              <div className="title-group">
-                <h3>Manus AI</h3>
-                <p className="api-desc">Motor de roteiros e imagens</p>
-              </div>
+      <div className="settings-grid-layout">
+        <div className="settings-main-column">
+          <section className="settings-card-modern serene-card">
+            <div className="card-header-modern">
+               <Shield size={20} className="text-blue" />
+               <h2>Motores de IA</h2>
             </div>
-            <div className={`status-badge ${manusKey ? 'connected' : 'error'}`}>
-              {manusKey ? 'Ativo' : 'Pendente'}
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label><Key size={14} /> Chave da API</label>
-            <div className="input-with-icon">
-              <input 
-                type="password" 
-                className="premium-input" 
-                value={manusKey}
-                onChange={(e) => { setManusKey(e.target.value); setHasChanges(true); }}
-                placeholder="sk-..."
-              />
-              {manusKey && <Check size={16} className="valid-icon" />}
-            </div>
-          </div>
-        </div>
-
-        {/* Typecast AI */}
-        <div className="api-card premium-card blue-border">
-          <div className="card-glow blue-glow"></div>
-          <div className="api-header">
-            <div className="api-info">
-              <div className="icon-circle blue-bg">
-                <Shield size={24} />
-              </div>
-              <div className="title-group">
-                <h3>Typecast AI</h3>
-                <p className="api-desc">Narração realista premium</p>
-              </div>
-            </div>
-            <div className={`status-badge ${typecastKey ? 'connected' : 'error'}`}>
-              {typecastKey ? 'Ativo' : 'Pendente'}
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label><Key size={14} /> Chave da API</label>
-            <div className="input-with-icon">
-              <input 
-                type="password" 
-                className="premium-input" 
-                value={typecastKey}
-                onChange={(e) => { setTypecastKey(e.target.value); setHasChanges(true); }}
-                placeholder="Insira sua chave aqui"
-              />
-              {typecastKey && <Check size={16} className="valid-icon" />}
-            </div>
-          </div>
-        </div>
-
-        {/* YouTube API */}
-        <div className="api-card premium-card red-border youtube-card">
-          <div className="card-glow red-glow"></div>
-          <div className="api-header">
-            <div className="api-info">
-              <div className="icon-circle red-bg">
-                <Youtube size={24} />
-              </div>
-              <div className="title-group">
-                <h3>YouTube Automation</h3>
-                <p className="api-desc">Publicação de Shorts</p>
-              </div>
-            </div>
-            <div className={`status-badge ${ytRefreshToken ? 'connected' : 'error'}`}>
-              {ytRefreshToken ? 'Conectado' : 'Desconectado'}
-            </div>
-          </div>
-          
-          <div className="yt-actions-container">
-            {GLOBAL_YT_CLIENT_ID && GLOBAL_YT_CLIENT_SECRET ? (
-              <GoogleOAuthProvider clientId={GLOBAL_YT_CLIENT_ID}>
-                <YoutubeConnectButton 
-                  clientId={GLOBAL_YT_CLIENT_ID} 
-                  clientSecret={GLOBAL_YT_CLIENT_SECRET}
-                  onTokensReceived={(token) => {
-                    setYtRefreshToken(token);
-                    saveConfigs(token);
-                  }}
+            
+            <div className="input-group-modern">
+              <label>Chave API Manus (Roteiro & Imagens)</label>
+              <div className="modern-input-wrapper">
+                <Key size={16} className="input-icon-left" />
+                <input 
+                  type={showManus ? "text" : "password"} 
+                  value={manusKey} 
+                  onChange={(e) => { setManusKey(e.target.value); setHasChanges(true); }}
+                  placeholder="sk-..."
                 />
-              </GoogleOAuthProvider>
-            ) : (
-               <div className="api-error-box">
-                 <AlertTriangle size={18} />
-                 <span>Configurações globais ausentes no servidor.</span>
-               </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="settings-section-divider">
-        <h2 className="section-title"><Volume2 size={24} /> Configurações de Voz</h2>
-        <p className="section-subtitle">Ajuste o idioma e a voz que o motor deve utilizar.</p>
-      </div>
-
-      <div className="voice-config-row">
-        <div className="form-group lang-select-group">
-          <label>Idioma da Narração</label>
-          <select 
-            className="premium-input" 
-            value={voiceLanguage} 
-            onChange={(e) => { setVoiceLanguage(e.target.value); setHasChanges(true); }}
-          >
-            {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
-          </select>
-        </div>
-      </div>
-
-      <div className="voice-gallery">
-        {VOICES.map((voice) => (
-          <div 
-            key={voice.id} 
-            className={`voice-card premium-card ${selectedVoice === voice.id ? 'selected-voice' : ''}`}
-            onClick={() => { setSelectedVoice(voice.id); setHasChanges(true); }}
-          >
-            <div className="voice-card-header">
-              <div className="voice-main-info">
-                <div className={`voice-avatar ${voice.gender === 'Feminino' ? 'pink-bg' : 'blue-bg'}`}>
-                  <User size={20} />
-                </div>
-                <div className="voice-name-group">
-                  <h4>{voice.name}</h4>
-                  <span className="voice-tag">{voice.gender}</span>
-                </div>
+                <button className="eye-toggle" onClick={() => setShowManus(!showManus)}>
+                  {showManus ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
-              <button 
-                className={`preview-btn ${playingVoice === voice.id ? 'playing' : ''}`}
-                onClick={(e) => { e.stopPropagation(); togglePreview(voice); }}
-                type="button"
-              >
-                {playingVoice === voice.id ? <Pause size={18} /> : <Play size={18} />}
-              </button>
             </div>
+
+            <div className="input-group-modern">
+              <label>Chave API Typecast (Narração)</label>
+              <div className="modern-input-wrapper">
+                <Key size={16} className="input-icon-left" />
+                <input 
+                  type={showTypecast ? "text" : "password"} 
+                  value={typecastKey} 
+                  onChange={(e) => { setTypecastKey(e.target.value); setHasChanges(true); }}
+                  placeholder="token..."
+                />
+                <button className="eye-toggle" onClick={() => setShowTypecast(!showTypecast)}>
+                  {showTypecast ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section className="settings-card-modern serene-card">
+            <div className="card-header-modern">
+               <Youtube size={20} className="text-red" />
+               <h2>YouTube Automation</h2>
+            </div>
+            <p className="card-sub-p">Conecte seu canal para permitir postagens automáticas de Shorts.</p>
             
-            <p className="voice-desc">{voice.desc}</p>
-            
-            <div className="voice-select-indicator">
-              {selectedVoice === voice.id ? (
-                <div className="selected-badge"><Check size={14} /> Selecionado</div>
+            <div className="yt-status-row">
+              <div className={`status-pill ${ytRefreshToken ? 'active' : ''}`}>
+                <div className="status-dot"></div>
+                {ytRefreshToken ? 'Canal Conectado' : 'Desconectado'}
+              </div>
+              
+              {GLOBAL_YT_CLIENT_ID && GLOBAL_YT_CLIENT_SECRET ? (
+                <GoogleOAuthProvider clientId={GLOBAL_YT_CLIENT_ID}>
+                  <YoutubeConnectButton 
+                    clientId={GLOBAL_YT_CLIENT_ID} 
+                    clientSecret={GLOBAL_YT_CLIENT_SECRET}
+                    onTokensReceived={(token: string) => { setYtRefreshToken(token); saveConfigs(token); }}
+                  />
+                </GoogleOAuthProvider>
               ) : (
-                <div className="unselected-label">Clique para selecionar</div>
+                <div className="error-badge-sm"><AlertTriangle size={14} /> ID do Cliente ausente</div>
               )}
             </div>
-          </div>
-        ))}
+          </section>
+
+          <section className="settings-card-modern serene-card">
+            <div className="card-header-modern">
+               <Volume2 size={20} className="text-blue" />
+               <h2>Preferências de Voz Padrão</h2>
+            </div>
+
+            <div className="form-row-modern">
+               <div className="input-group-modern">
+                  <label>Idioma</label>
+                  <select value={voiceLanguage} onChange={(e) => { setVoiceLanguage(e.target.value); setHasChanges(true); }}>
+                    {LANGUAGES.map(l => <option key={l}>{l}</option>)}
+                  </select>
+               </div>
+            </div>
+
+            <div className="voice-mini-grid">
+               {VOICES.map(voice => (
+                 <div 
+                   key={voice.id} 
+                   className={`voice-pill-card ${selectedVoice === voice.id ? 'active' : ''}`}
+                   onClick={() => { setSelectedVoice(voice.id); setHasChanges(true); }}
+                 >
+                   <div className="voice-pill-info">
+                      <div className="voice-pill-avatar"><User size={14} /></div>
+                      <span>{voice.name}</span>
+                   </div>
+                   <button className="voice-pill-play" onClick={(e) => { e.stopPropagation(); togglePreview(voice); }}>
+                      {playingVoice === voice.id ? <Pause size={14} /> : <Play size={14} />}
+                   </button>
+                 </div>
+               ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="settings-side-column">
+           <div className="help-card serene-card">
+              <h3>Suporte ao Usuário</h3>
+              <p>Precisa de ajuda para obter suas chaves de API? Confira nossos tutoriais.</p>
+              <button className="link-btn-modern">Ver Documentação</button>
+           </div>
+        </div>
       </div>
 
-      <div className={`floating-save-bar ${hasChanges ? 'visible' : ''}`}>
-        <div className="save-bar-content glass-effect">
-          <div className="save-bar-text">
-            <h4>Alterações detectadas</h4>
-            <p>Salve para aplicar as novas chaves ao motor.</p>
-          </div>
-          <button className="premium-save-btn" onClick={() => saveConfigs()} disabled={saving}>
-            {saving ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <>
-                <span>Salvar Tudo</span>
-                <Save size={18} />
-              </>
-            )}
-          </button>
-        </div>
+      <div className={`save-action-bar ${hasChanges ? 'visible' : ''}`}>
+         <div className="save-bar-inner glass-effect">
+            <div className="save-info">
+               <span className="save-title">Alterações não salvas</span>
+               <span className="save-subtitle">Clique em salvar para aplicar as novas chaves.</span>
+            </div>
+            <button className="modern-save-btn" onClick={() => saveConfigs()} disabled={saving}>
+               {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+               <span>Salvar Tudo</span>
+            </button>
+         </div>
       </div>
     </div>
   );

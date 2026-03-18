@@ -32,24 +32,24 @@ const Sidebar: React.FC = () => {
       
       <div className="sidebar-section-label">PROJETOS</div>
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({ isActive }) => `nav-item teal-nav ${isActive ? 'active' : ''}`}>
-          <MessageSquare size={20} />
-          <span>Início / Chat</span>
+        <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <MessageSquare size={18} />
+          <span>Nova Geração</span>
         </NavLink>
         
-        <NavLink to="/agendamentos" className={({ isActive }) => `nav-item blue-nav ${isActive ? 'active' : ''}`}>
-          <Calendar size={20} />
-          <span>Agendamentos</span>
+        <NavLink to="/agendamentos" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <Calendar size={18} />
+          <span>Automação</span>
         </NavLink>
         
-        <NavLink to="/configuracoes" className={({ isActive }) => `nav-item red-nav ${isActive ? 'active' : ''}`}>
-          <Settings size={20} />
-          <span>Configurações API</span>
+        <NavLink to="/configuracoes" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <Settings size={18} />
+          <span>Configurações</span>
         </NavLink>
       </nav>
 
       <div className="sidebar-history-container">
-        <div className="sidebar-section-label blue-fade">TODAS AS TAREFAS</div>
+        <div className="sidebar-section-label">GERAÇÕES RECENTES</div>
         <div className="history-list">
           {history.map((item) => (
             <div key={item.id} className="history-item">
