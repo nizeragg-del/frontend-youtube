@@ -6,7 +6,7 @@ import './Scheduling.css';
 const VOICES_BY_LANGUAGE: Record<string, any[]> = {
   'Português': [
     { id: 'tc_5f8d7b0de146f10007b8042f', name: 'Camila', gender: 'Feminino', preview: '/assets/previews/camila.mp3' },
-    { id: 'tc_61a1a72d4ecbefd29fb44383', name: 'Gabriel', gender: 'Masculino', preview: '/assets/previews/gabriel.mp3' },
+    { id: 'tc_67db753311833db994c4fed7', name: 'Elias', gender: 'Masculino', preview: '/assets/previews/elias.mp3' },
   ],
   'Inglês': [
     { id: 'tc_6777669145604e14c7ff8f03', name: 'Victoria', gender: 'Feminino', preview: '/assets/previews/victoria.mp3' },
@@ -18,7 +18,7 @@ const VOICES_BY_LANGUAGE: Record<string, any[]> = {
   ],
   'Francês': [
     { id: 'tc_686dc45bbd6351e06ee64daf', name: 'Elise', gender: 'Feminino', preview: '/assets/previews/elise.mp3' },
-    { id: 'tc_68ef0674d8af7548a74e5428', name: 'Gerard', gender: 'Masculino', preview: '/assets/previews/gerard.mp3' },
+    { id: 'tc_682e8798603b4e9ed84074f5', name: 'Hyeongjin', gender: 'Masculino', preview: '/assets/previews/hyeongjin.mp3' },
   ],
   'Alemão': [
     { id: 'tc_684a5a7ba2ce934624b59c6e', name: 'Nia', gender: 'Feminino', preview: '/assets/previews/nia.mp3' },
