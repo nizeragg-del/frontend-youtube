@@ -17,21 +17,20 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* Aligning content to the left/start */
   justify-content: center;
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  padding: 40px 60px; /* Generous but controlled padding */
+  max-width: 1000px; /* Increased max-width for better space usage */
   width: 100%;
 }
 
 .home-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 40px;
 }
 
 .home-title {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 12px;
@@ -39,7 +38,7 @@
 }
 
 .home-subtitle {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--color-text-secondary);
   font-weight: 500;
 }
@@ -54,7 +53,7 @@
 .suggestions-row {
   display: flex;
   gap: 12px;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
 }
 
