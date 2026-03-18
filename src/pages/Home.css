@@ -17,15 +17,16 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Aligning content to the left/start */
+  align-items: center; /* Back to centering */
   justify-content: center;
-  padding: 40px 60px; /* Generous but controlled padding */
-  max-width: 1000px; /* Increased max-width for better space usage */
+  padding: 40px 20px;
+  max-width: 900px;
+  margin: 0 auto; /* Centering relative to available space */
   width: 100%;
 }
 
 .home-header {
-  text-align: left;
+  text-align: center;
   margin-bottom: 40px;
 }
 
@@ -53,7 +54,7 @@
 .suggestions-row {
   display: flex;
   gap: 12px;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
 }
 
