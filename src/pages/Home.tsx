@@ -42,7 +42,7 @@ const Home = () => {
 
       const { data: config, error: configError } = await supabase
         .from('user_configs')
-        .select('manus_api_key, typecast_api_key')
+        .select('manus_api_key, typecast_api_key, voice_id, voice_language')
         .eq('user_id', user.id)
         .single();
 
@@ -71,7 +71,9 @@ const Home = () => {
           ref: 'main',
           inputs: {
             topic: prompt,
-            user_id: user.id
+            user_id: user.id,
+            voice_id: config.voice_id || 'tc_5f8d7b0de146f10007b8042f',
+            voice_language: config.voice_language || 'Português'
           }
         })
       });
