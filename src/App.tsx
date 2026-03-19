@@ -31,6 +31,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Contact from './pages/Contact';
+
 function App() {
   return (
     <BrowserRouter>
@@ -47,6 +51,9 @@ function App() {
           <Route index element={<Home />} />
           <Route path="agendamentos" element={<Scheduling />} />
           <Route path="configuracoes" element={<Settings />} />
+          <Route path="termos" element={<Terms />} />
+          <Route path="privacidade" element={<Privacy />} />
+          <Route path="contato" element={<Contact />} />
         </Route>
         {/* Fallback para home */}
         <Route path="*" element={<Navigate to="/" replace />} />

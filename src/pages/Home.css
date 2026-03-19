@@ -17,11 +17,11 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Back to centering */
+  align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  max-width: 900px;
-  margin: 0 auto; /* Centering relative to available space */
+  max-width: 800px; /* Reduced for better focus and alignment */
+  margin: 0 auto;
   width: 100%;
 }
 
@@ -89,7 +89,7 @@
 
 .input-pannel {
   width: 100%;
-  max-width: 760px;
+  max-width: 800px; /* Match home-content max-width */
   margin-top: 20px;
 }
 
