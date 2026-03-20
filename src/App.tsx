@@ -52,7 +52,9 @@ function App() {
           <Route path="agendamentos" element={<Scheduling />} />
           <Route path="configuracoes" element={<Settings />} />
           <Route path="termos" element={<Terms />} />
+          <Route path="terms" element={<Terms />} />
           <Route path="privacidade" element={<Privacy />} />
+          <Route path="privacy" element={<Privacy />} />
           <Route path="contato" element={<Contact />} />
         </Route>
         {/* Fallback para home */}
