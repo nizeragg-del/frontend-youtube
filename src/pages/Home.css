@@ -198,3 +198,112 @@
   .home-title { font-size: 1.8rem; }
   .suggestions-row { display: none; }
 }
+
+/* Feature Carousel */
+.info-carousel-container {
+  margin-top: 60px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.02); /* Subtle surface */
+  border-radius: 24px;
+  padding: 32px 0;
+  border: 1px solid var(--color-border);
+}
+
+.info-carousel-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-card-slide {
+  flex: 0 0 100%;
+  padding: 0 40px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.info-modern-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 580px;
+  gap: 32px;
+}
+
+.info-card-text {
+  flex: 1;
+  text-align: left;
+}
+
+.info-card-text h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.info-card-text p {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.info-card-visual {
+  background: white;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #E5E7EB;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-dot.active {
+  background: var(--color-blue);
+  width: 24px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+@media (max-width: 640px) {
+  .info-carousel-container {
+    padding: 24px 0;
+    margin-top: 40px;
+  }
+  .info-modern-card-content {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 16px;
+  }
+  .info-card-text {
+    text-align: center;
+  }
+  .info-card-visual {
+    width: 56px;
+    height: 56px;
+  }
+}

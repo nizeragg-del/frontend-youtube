@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Send, Sparkles, Loader2, AlertCircle, Plus, Zap, History } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Send, Sparkles, Loader2, AlertCircle, Plus, Zap, History, Globe } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
@@ -8,7 +8,42 @@ const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cardIndex, setCardIndex] = useState(0);
   const navigate = useNavigate();
+
+  const infoCards = [
+    {
+      title: "Nichos Inteligentes",
+      description: "A IA escolhe sub-temas virais dentro do seu nicho favorito.",
+      icon: <Zap size={24} />,
+      color: "#E11D48"
+    },
+    {
+      title: "Vídeos Diários",
+      description: "Sua conta cresce sozinha com postagens agendadas para o horário de pico.",
+      icon: <History size={24} />,
+      color: "#F59E0B"
+    },
+    {
+      title: "Títulos & Hashtags",
+      description: "Metadados otimizados automaticamente para o algoritmo do YouTube Shorts.",
+      icon: <Sparkles size={24} />,
+      color: "#3B82F6"
+    },
+    {
+      title: "Vozes Humanizadas",
+      description: "Escolha entre diversos narradores com entonação natural em português.",
+      icon: <Globe size={24} />,
+      color: "#10B981"
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCardIndex((prev) => (prev + 1) % infoCards.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
 
   const suggestions = [
     { text: "Curiosidade sobre o espaço", icon: <Zap size={14} /> },
@@ -140,6 +175,33 @@ const Home = () => {
                 )}
               </div>
             )}
+          </div>
+
+          <div className="info-carousel-container">
+            <div className="info-carousel-track" style={{ transform: `translateX(-${cardIndex * 100}%)` }}>
+              {infoCards.map((card, i) => (
+                <div key={i} className="info-card-slide">
+                  <div className="info-modern-card-content">
+                     <div className="info-card-text">
+                        <h3>{card.title}</h3>
+                        <p>{card.description}</p>
+                     </div>
+                     <div className="info-card-visual" style={{ color: card.color }}>
+                        {card.icon}
+                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="carousel-dots">
+              {infoCards.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`carousel-dot ${cardIndex === i ? 'active' : ''}`}
+                  onClick={() => setCardIndex(i)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </main>
