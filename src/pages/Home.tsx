@@ -46,6 +46,13 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSuggestionsIndex((prev: number) => (prev + 1) >= Math.ceil(suggestions.length / 3) ? 0 : prev + 1);
+    }, 8500); // Slightly different timing for visual variety
+    return () => clearInterval(timer);
+  }, [suggestions.length]);
+
   const suggestions = [
     { text: "Histórias Bíblicas", icon: <History size={14} /> },
     { text: "Curiosidades Espaciais", icon: <Zap size={14} /> },
