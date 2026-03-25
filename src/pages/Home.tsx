@@ -107,7 +107,7 @@ const Home = () => {
             <div className={`pill-input-wrapper ${loading ? 'loading-state' : ''}`}>
               <Plus className="input-plus-icon" size={20} />
               <textarea 
-                placeholder="Descreva o tema para gerar um vídeo viral..."
+                placeholder="Descreva um nicho (ex: Motivação Bíblica) para gerar um vídeo viral..."
                 value={prompt}
                 onChange={(e) => {
                   setPrompt(e.target.value);

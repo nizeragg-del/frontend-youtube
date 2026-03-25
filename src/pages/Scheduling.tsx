@@ -106,7 +106,7 @@ const Scheduling: React.FC = () => {
   };
 
   const toggleDay = (day: string) => {
-    setSelectedDays(prev => 
+    setSelectedDays(prev =>
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     );
   };
@@ -141,151 +141,154 @@ const Scheduling: React.FC = () => {
 
       <div className="scheduling-grid">
         <div className="scheduling-sidebar">
-           <div className="status-card serene-card">
-              <div className="status-header">
-                 <div className="status-title">
-                    <Zap size={18} className={automationActive ? "active-zap" : ""} />
-                    <span>Automação Ativa</span>
-                 </div>
-                 <div 
-                   className={`modern-toggle ${automationActive ? 'active' : ''}`}
-                   onClick={() => setAutomationActive(!automationActive)}
-                 >
-                   <div className="toggle-handle" />
-                 </div>
+          <div className="status-card serene-card">
+            <div className="status-header">
+              <div className="status-title">
+                <Zap size={18} className={automationActive ? "active-zap" : ""} />
+                <span>Automação Ativa</span>
               </div>
-              <p className="status-desc">
-                {automationActive 
-                  ? "Sua conta está gerando novos conteúdos conforme o agendamento." 
-                  : "A geração automática está pausada no momento."}
-              </p>
-           </div>
+              <div
+                className={`modern-toggle ${automationActive ? 'active' : ''}`}
+                onClick={() => setAutomationActive(!automationActive)}
+              >
+                <div className="toggle-handle" />
+              </div>
+            </div>
+            <p className="status-desc">
+              {automationActive
+                ? "Sua conta está gerando novos conteúdos conforme o agendamento."
+                : "A geração automática está pausada no momento."}
+            </p>
+          </div>
 
-           <div className="info-modern-card">
-              <h3>Dicas de Automação</h3>
-              <ul>
-                 <li>Temas amplos tendem a performar melhor.</li>
-                 <li>Escolha vozes que combinem com seu nicho.</li>
-                 <li>Vídeos são renderizados no horário selecionado.</li>
-              </ul>
-           </div>
+          <div className="info-modern-card">
+            <h3>Dicas de Automação</h3>
+            <ul>
+              <li>Temas amplos tendem a performar melhor.</li>
+              <li>Escolha vozes que combinem com seu nicho.</li>
+              <li>Vídeos são renderizados no horário selecionado.</li>
+            </ul>
+          </div>
         </div>
 
         <div className="scheduling-content">
-           <section className="config-section serene-card">
-              <h2 className="section-title">Configurações Gerais</h2>
-              <div className="form-row">
-                 <div className="form-group">
-                    <label><Layout size={16} /> Tema Principal</label>
-                    <input 
-                      type="text" 
-                      placeholder="Ex: Curiosidades sobre tecnologia"
-                      value={theme}
-                      onChange={(e) => setTheme(e.target.value)}
-                    />
-                 </div>
-                 <div className="form-group">
-                    <label><Globe size={16} /> Idioma Oficial</label>
-                    <select 
-                      value={language} 
-                      onChange={(e) => {
-                        const newLang = e.target.value;
-                        setLanguage(newLang);
-                        if (VOICES_BY_LANGUAGE[newLang]) {
-                          setSelectedVoice(VOICES_BY_LANGUAGE[newLang][0].id);
-                        }
-                      }}
-                    >
-                       {LANGUAGES.map(l => <option key={l}>{l}</option>)}
-                    </select>
-                 </div>
+          <section className="config-section serene-card">
+            <h2 className="section-title">Configurações Gerais</h2>
+            <div className="form-row">
+              <div className="form-group">
+                <label><Layout size={16} /> Nicho de Conteúdo</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Histórias Bíblicas, Curiosidades do Espaço"
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                />
+                <p className="input-hint" style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
+                  A IA gerará um tema diferente dentro desse nicho a cada postagem.
+                </p>
               </div>
+              <div className="form-group">
+                <label><Globe size={16} /> Idioma Oficial</label>
+                <select
+                  value={language}
+                  onChange={(e) => {
+                    const newLang = e.target.value;
+                    setLanguage(newLang);
+                    if (VOICES_BY_LANGUAGE[newLang]) {
+                      setSelectedVoice(VOICES_BY_LANGUAGE[newLang][0].id);
+                    }
+                  }}
+                >
+                  {LANGUAGES.map(l => <option key={l}>{l}</option>)}
+                </select>
+              </div>
+            </div>
 
-                <div className="voice-selection-box">
-                  <label className="input-label">Selecionar Narrador ({language})</label>
-                  <div className="voice-cards-grid">
-                    {(VOICES_BY_LANGUAGE[language] || []).map(voice => (
-                      <div 
-                        key={voice.id} 
-                        className={`modern-voice-card ${selectedVoice === voice.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedVoice(voice.id)}
-                      >
-                         <div className="voice-main-info">
-                            <div className="voice-icon-box">
-                               <User size={16} />
-                            </div>
-                            <div className="voice-text-info">
-                               <span className="voice-name">{voice.name}</span>
-                               <span className="voice-tag">{voice.gender}</span>
-                            </div>
-                         </div>
-                         <button 
-                           className={`voice-play-circle ${playingVoice === voice.id ? 'playing' : ''}`}
-                           onClick={(e) => { e.stopPropagation(); handlePreview(voice); }}
-                         >
-                            {playingVoice === voice.id ? <Pause size={14} /> : <Play size={14} />}
-                         </button>
-                         {selectedVoice === voice.id && <div className="selected-dot"><Check size={10} /></div>}
+            <div className="voice-selection-box">
+              <label className="input-label">Selecionar Narrador ({language})</label>
+              <div className="voice-cards-grid">
+                {(VOICES_BY_LANGUAGE[language] || []).map(voice => (
+                  <div
+                    key={voice.id}
+                    className={`modern-voice-card ${selectedVoice === voice.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedVoice(voice.id)}
+                  >
+                    <div className="voice-main-info">
+                      <div className="voice-icon-box">
+                        <User size={16} />
                       </div>
-                    ))}
+                      <div className="voice-text-info">
+                        <span className="voice-name">{voice.name}</span>
+                        <span className="voice-tag">{voice.gender}</span>
+                      </div>
+                    </div>
+                    <button
+                      className={`voice-play-circle ${playingVoice === voice.id ? 'playing' : ''}`}
+                      onClick={(e) => { e.stopPropagation(); handlePreview(voice); }}
+                    >
+                      {playingVoice === voice.id ? <Pause size={14} /> : <Play size={14} />}
+                    </button>
+                    {selectedVoice === voice.id && <div className="selected-dot"><Check size={10} /></div>}
                   </div>
-                </div>
-
-              <div className="speed-selection-box" style={{ marginTop: '20px', marginBottom: '20px', background: '#fcfcfc', padding: '16px', borderRadius: '12px', border: '1px solid #f0f0f0' }}>
-                 <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                   <span>Velocidade da Voz</span>
-                   <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{speechSpeed.toFixed(2)}x</span>
-                 </label>
-                 <input 
-                   type="range" 
-                   min="0.5" 
-                   max="2.0" 
-                   step="0.05" 
-                   value={speechSpeed} 
-                   onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
-                   style={{ 
-                     width: '100%', 
-                     accentColor: 'var(--primary)',
-                     height: '6px',
-                     borderRadius: '4px',
-                     cursor: 'pointer'
-                   }}
-                 />
-                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#888', marginTop: '8px', fontWeight: 500 }}>
-                    <span>0.5x (Lento)</span>
-                    <span>1.0x (Normal)</span>
-                    <span>2.0x (Rápido)</span>
-                 </div>
+                ))}
               </div>
+            </div>
 
-              <div className="calendar-box">
-                 <label className="input-label">Dias de Geração</label>
-                 <div className="modern-days-row">
-                    {days.map(day => (
-                      <button 
-                        key={day}
-                        className={`modern-day-item ${selectedDays.includes(day) ? 'active' : ''}`}
-                        onClick={() => toggleDay(day)}
-                      >
-                        {day}
-                      </button>
-                    ))}
-                 </div>
+            <div className="speed-selection-box" style={{ marginTop: '20px', marginBottom: '20px', background: '#fcfcfc', padding: '16px', borderRadius: '12px', border: '1px solid #f0f0f0' }}>
+              <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span>Velocidade da Voz</span>
+                <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{speechSpeed.toFixed(2)}x</span>
+              </label>
+              <input
+                type="range"
+                min="0.5"
+                max="2.0"
+                step="0.05"
+                value={speechSpeed}
+                onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
+                style={{
+                  width: '100%',
+                  accentColor: 'var(--primary)',
+                  height: '6px',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#888', marginTop: '8px', fontWeight: 500 }}>
+                <span>0.5x (Lento)</span>
+                <span>1.0x (Normal)</span>
+                <span>2.0x (Rápido)</span>
               </div>
-           </section>
+            </div>
 
-           <div className="action-footer">
-              {error && <span className="error-text-small">{error}</span>}
-              <button 
-                className="primary-save-btn"
-                onClick={saveSchedule}
-                disabled={saving}
-              >
-                {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                <span>Salvar Alterações</span>
-                <ChevronRight size={16} />
-              </button>
-           </div>
+            <div className="calendar-box">
+              <label className="input-label">Dias de Geração</label>
+              <div className="modern-days-row">
+                {days.map(day => (
+                  <button
+                    key={day}
+                    className={`modern-day-item ${selectedDays.includes(day) ? 'active' : ''}`}
+                    onClick={() => toggleDay(day)}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <div className="action-footer">
+            {error && <span className="error-text-small">{error}</span>}
+            <button
+              className="primary-save-btn"
+              onClick={saveSchedule}
+              disabled={saving}
+            >
+              {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              <span>Salvar Alterações</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
