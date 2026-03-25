@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Send, Sparkles, Loader2, AlertCircle, Plus, Zap, History, Globe } from 'lucide-react';
+import { Send, Sparkles, Loader2, AlertCircle, Plus, Zap, History, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
@@ -9,6 +9,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cardIndex, setCardIndex] = useState(0);
+  const [suggestionsIndex, setSuggestionsIndex] = useState(0);
   const navigate = useNavigate();
 
   const infoCards = [
@@ -46,10 +47,40 @@ const Home = () => {
   }, []);
 
   const suggestions = [
-    { text: "Curiosidade sobre o espaço", icon: <Zap size={14} /> },
-    { text: "Mensagem de fé (Salmo 23)", icon: <Sparkles size={14} /> },
-    { text: "História Bíblica de Davi", icon: <History size={14} /> }
+    { text: "Histórias Bíblicas", icon: <History size={14} /> },
+    { text: "Curiosidades Espaciais", icon: <Zap size={14} /> },
+    { text: "Mensagens de Fé", icon: <Sparkles size={14} /> },
+    { text: "Mistérios do Egito", icon: <History size={14} /> },
+    { text: "Fatos do Oceano", icon: <Globe size={14} /> },
+    { text: "Dicas de Produtividade", icon: <Zap size={14} /> },
+    { text: "Receitas 1 Minuto", icon: <Plus size={14} /> },
+    { text: "Mundo Gamer", icon: <Zap size={14} /> },
+    { text: "Vida em Marte", icon: <Globe size={14} /> },
+    { text: "Segredos das Pirâmides", icon: <History size={14} /> },
+    { text: "Superação Diária", icon: <History size={14} /> },
+    { text: "Mundo dos Pets", icon: <Zap size={14} /> },
+    { text: "Mente Humana", icon: <Sparkles size={14} /> },
+    { text: "Tech do Futuro", icon: <Zap size={14} /> },
+    { text: "Belezas Naturais", icon: <Globe size={14} /> },
+    { text: "Universo Paralelo", icon: <Zap size={14} /> },
+    { text: "Meditação Guiada", icon: <Sparkles size={14} /> },
+    { text: "História de Moisés", icon: <History size={14} /> },
+    { text: "O Sol e a Lua", icon: <Zap size={14} /> },
+    { text: "Curiosidades Animais", icon: <Zap size={14} /> },
+    { text: "Triângulo Bermudas", icon: <Globe size={14} /> },
+    { text: "Era dos Dinossauros", icon: <History size={14} /> },
+    { text: "Finanças Pessoais", icon: <Zap size={14} /> },
+    { text: "Ciência Divertida", icon: <Sparkles size={14} /> },
+    { text: "Invenções Incríveis", icon: <History size={14} /> }
   ];
+
+  const nextSuggestions = () => {
+    setSuggestionsIndex((prev: number) => (prev + 1) >= Math.ceil(suggestions.length / 3) ? 0 : prev + 1);
+  };
+
+  const prevSuggestions = () => {
+    setSuggestionsIndex((prev: number) => (prev - 1) < 0 ? Math.ceil(suggestions.length / 3) - 1 : prev - 1);
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -129,13 +160,26 @@ const Home = () => {
         </header>
 
         <div className="generation-area">
-          <div className="suggestions-row">
-            {suggestions.map((s, i) => (
-              <button key={i} className="suggestion-card" onClick={() => setPrompt(s.text)}>
-                <span className="suggestion-icon">{s.icon}</span>
-                <span className="suggestion-text">{s.text}</span>
-              </button>
-            ))}
+          <div className="suggestions-carousel-container">
+            <button className="nav-button prev" onClick={prevSuggestions}>
+              <ChevronLeft size={18} />
+            </button>
+            <div className="suggestions-mask">
+              <div 
+                className="suggestions-track" 
+                style={{ transform: `translateX(-${suggestionsIndex * 100}%)` }}
+              >
+                {suggestions.map((s, i) => (
+                  <button key={i} className="suggestion-card" onClick={() => setPrompt(s.text)}>
+                    <span className="suggestion-icon">{s.icon}</span>
+                    <span className="suggestion-text">{s.text}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button className="nav-button next" onClick={nextSuggestions}>
+              <ChevronRight size={18} />
+            </button>
           </div>
 
           <div className="input-pannel">
