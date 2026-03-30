@@ -126,9 +126,35 @@ const Home = () => {
     }
   };
 
-  // Subscribe to real-time updates
+  // Subscribe to real-time updates + Polling Fallback
   useEffect(() => {
     if (!generationId) return;
+
+    console.log("Setting up Realtime and Polling for:", generationId);
+
+    // Fallback Polling (Check every 5 seconds)
+    const pollInterval = setInterval(async () => {
+      if (step !== 'processing_script' && step !== 'rendering') return;
+
+      console.log("Polling status for:", generationId);
+      const { data, error } = await supabase
+        .from('generations')
+        .select('*')
+        .eq('id', generationId)
+        .single();
+
+      if (!error && data) {
+        if (data.status === 'awaiting_audio' && step === 'processing_script' && data.script_data) {
+          console.log("Polling found update: awaiting_audio");
+          setScriptData(data.script_data);
+          setStep('script_review');
+        } else if (data.status === 'completed' && step === 'rendering' && data.video_url) {
+          console.log("Polling found update: completed");
+          setVideoUrl(data.video_url);
+          setStep('completed');
+        }
+      }
+    }, 5000);
 
     const channel = supabase
       .channel(`gen_${generationId}`)
@@ -138,6 +164,7 @@ const Home = () => {
         table: 'generations', 
         filter: `id=eq.${generationId}` 
       }, (payload) => {
+        console.log("Realtime Update Received:", payload);
         const updated = payload.new;
         if (updated.status === 'awaiting_audio' && updated.script_data) {
           setScriptData(updated.script_data);
@@ -149,10 +176,15 @@ const Home = () => {
           setError("Geração falhou no servidor.");
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Realtime Channel Status:", status);
+      });
 
-    return () => { supabase.removeChannel(channel); };
-  }, [generationId]);
+    return () => { 
+      clearInterval(pollInterval);
+      supabase.removeChannel(channel); 
+    };
+  }, [generationId, step]);
 
   const confirmRender = async () => {
     setLoading(true);
