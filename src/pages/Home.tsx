@@ -95,6 +95,7 @@ const Home = () => {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ref: 'main',
@@ -159,6 +160,7 @@ const Home = () => {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ref: 'main',
