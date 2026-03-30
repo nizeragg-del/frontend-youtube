@@ -1,160 +1,325 @@
-import { useState, useEffect } from 'react';
-import { Send, Sparkles, Loader2, AlertCircle, Plus, Zap, History, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { 
+  Sparkles, Loader2, AlertCircle, Zap, ChevronLeft, ChevronRight, 
+  CheckCircle2, Upload, Play, Download, Music
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
+type GenerationStep = 'mode_selection' | 'image_upload' | 'prompt_input' | 'processing_script' | 'script_review' | 'rendering' | 'completed';
+
 const Home = () => {
+  const [step, setStep] = useState<GenerationStep>('mode_selection');
+  const [videoType, setVideoType] = useState<'viral' | 'creative'>('viral');
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cardIndex, setCardIndex] = useState(0);
-  const [suggestionsIndex, setSuggestionsIndex] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
+  const [generationId, setGenerationId] = useState<string | null>(null);
+  const [scriptData, setScriptData] = useState<any>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const infoCards = [
-    {
-      title: "Nichos Inteligentes",
-      description: "A IA escolhe sub-temas virais dentro do seu nicho favorito.",
-      icon: <Zap size={24} />,
-      color: "#E11D48"
-    },
-    {
-      title: "Vídeos Diários",
-      description: "Sua conta cresce sozinha com postagens agendadas para o horário de pico.",
-      icon: <History size={24} />,
-      color: "#F59E0B"
-    },
-    {
-      title: "Títulos & Hashtags",
-      description: "Metadados otimizados automaticamente para o algoritmo do YouTube Shorts.",
-      icon: <Sparkles size={24} />,
-      color: "#3B82F6"
-    },
-    {
-      title: "Vozes Humanizadas",
-      description: "Escolha entre diversos narradores com entonação natural em português.",
-      icon: <Globe size={24} />,
-      color: "#10B981"
-    }
-  ];
-
-  const suggestions = [
-    { text: "Histórias Bíblicas", icon: <History size={14} /> },
-    { text: "Curiosidades Espaciais", icon: <Zap size={14} /> },
-    { text: "Mensagens de Fé", icon: <Sparkles size={14} /> },
-    { text: "Mistérios do Egito", icon: <History size={14} /> },
-    { text: "Fatos do Oceano", icon: <Globe size={14} /> },
-    { text: "Dicas de Produtividade", icon: <Zap size={14} /> },
-    { text: "Receitas 1 Minuto", icon: <Plus size={14} /> },
-    { text: "Mundo Gamer", icon: <Zap size={14} /> },
-    { text: "Vida em Marte", icon: <Globe size={14} /> },
-    { text: "Segredos das Pirâmides", icon: <History size={14} /> },
-    { text: "Superação Diária", icon: <History size={14} /> },
-    { text: "Mundo dos Pets", icon: <Zap size={14} /> },
-    { text: "Mente Humana", icon: <Sparkles size={14} /> },
-    { text: "Tech do Futuro", icon: <Zap size={14} /> },
-    { text: "Belezas Naturais", icon: <Globe size={14} /> },
-    { text: "Universo Paralelo", icon: <Zap size={14} /> },
-    { text: "Meditação Guiada", icon: <Sparkles size={14} /> },
-    { text: "História de Moisés", icon: <History size={14} /> },
-    { text: "O Sol e a Lua", icon: <Zap size={14} /> },
-    { text: "Curiosidades Animais", icon: <Zap size={14} /> },
-    { text: "Triângulo Bermudas", icon: <Globe size={14} /> },
-    { text: "Era dos Dinossauros", icon: <History size={14} /> },
-    { text: "Finanças Pessoais", icon: <Zap size={14} /> },
-    { text: "Ciência Divertida", icon: <Sparkles size={14} /> },
-    { text: "Invenções Incríveis", icon: <History size={14} /> }
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCardIndex((prev) => (prev + 1) % infoCards.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSuggestionsIndex((prev: number) => (prev + 1) >= Math.ceil(suggestions.length / 3) ? 0 : prev + 1);
-    }, 8500);
-    return () => clearInterval(timer);
-  }, [suggestions.length]);
-
-  const nextSuggestions = () => {
-    setSuggestionsIndex((prev: number) => (prev + 1) >= Math.ceil(suggestions.length / 3) ? 0 : prev + 1);
-  };
-
-  const prevSuggestions = () => {
-    setSuggestionsIndex((prev: number) => (prev - 1) < 0 ? Math.ceil(suggestions.length / 3) - 1 : prev - 1);
-  };
-
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError("Por favor, descreva o tema do vídeo.");
-      return;
-    }
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     setLoading(true);
-    setError(null);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não logado");
 
+      const uploadedUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Math.random()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('generations')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('generations')
+          .getPublicUrl(fileName);
+        
+        uploadedUrls.push(publicUrl);
+      }
+
+      setImages(prev => [...prev, ...uploadedUrls]);
+    } catch (err: any) {
+      setError("Erro ao carregar imagens.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startGeneration = async () => {
+    setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        setError("Você precisa estar logado para gerar vídeos.");
         navigate('/login');
         return;
       }
 
-      const { data: config, error: configError } = await supabase
+      // 1. Criar registro no Supabase
+      const { data: gen, error: genError } = await supabase
+        .from('generations')
+        .insert({
+          user_id: user.id,
+          topic: prompt,
+          video_type: videoType,
+          image_references: images,
+          status: 'scripting'
+        })
+        .select()
+        .single();
+
+      if (genError) throw genError;
+      setGenerationId(gen.id);
+
+      // 2. Trigger GitHub Action Phase 1
+      const { data: config } = await supabase
         .from('user_configs')
-        .select('manus_api_key, typecast_api_key, voice_id, voice_language')
+        .select('*')
         .eq('user_id', user.id)
         .single();
 
-      if (configError || !config?.manus_api_key || !config?.typecast_api_key) {
-        setError("API Keys não configuradas. Por favor, acesse as Configurações.");
-        return;
-      }
-
-      const githubToken = import.meta.env.VITE_GITHUB_TOKEN;
-      const owner = import.meta.env.VITE_BACKEND_REPO_OWNER;
-      const repo = import.meta.env.VITE_BACKEND_REPO_NAME;
-
-      if (!githubToken || !owner || !repo) {
-        setError("Configuração do servidor de renderização incompleta.");
-        return;
-      }
-
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/workflows/render.yml/dispatches`, {
+      const response = await fetch(`https://api.github.com/repos/${import.meta.env.VITE_BACKEND_REPO_OWNER}/${import.meta.env.VITE_BACKEND_REPO_NAME}/actions/workflows/render.yml/dispatches`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${githubToken}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ref: 'main',
           inputs: {
             topic: prompt,
             user_id: user.id,
-            voice_id: config.voice_id || 'tc_5f8d7b0de146f10007b8042f',
-            voice_language: config.voice_language || 'Português'
+            generation_id: gen.id,
+            video_type: videoType,
+            image_references: images.join(','),
+            phase: 'script',
+            voice_id: config?.voice_id || 'tc_5f8d7b0de146f10007b8042f',
+            voice_language: config?.voice_language || 'Português'
           }
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Falha ao iniciar processo no GitHub.");
-      }
+      if (!response.ok) throw new Error("Erro ao iniciar motor.");
 
-      setPrompt("");
-      alert("🚀 Sucesso! O motor foi iniciado. O progresso aparecerá no Histórico.");
-      
+      setStep('processing_script');
     } catch (err: any) {
-      setError(err.message || "Erro ao iniciar a geração.");
+      setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    if (!generationId) return;
+
+    const channel = supabase
+      .channel(`gen_${generationId}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'generations', 
+        filter: `id=eq.${generationId}` 
+      }, (payload) => {
+        const updated = payload.new;
+        if (updated.status === 'awaiting_audio' && updated.script_data) {
+          setScriptData(updated.script_data);
+          setStep('script_review');
+        } else if (updated.status === 'completed' && updated.video_url) {
+          setVideoUrl(updated.video_url);
+          setStep('completed');
+        } else if (updated.status === 'failed') {
+          setError("Geração falhou no servidor.");
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [generationId]);
+
+  const confirmRender = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const response = await fetch(`https://api.github.com/repos/${import.meta.env.VITE_BACKEND_REPO_OWNER}/${import.meta.env.VITE_BACKEND_REPO_NAME}/actions/workflows/render.yml/dispatches`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: {
+            topic: prompt,
+            user_id: user?.id,
+            generation_id: generationId,
+            phase: 'render'
+          }
+        })
+      });
+
+      if (!response.ok) throw new Error("Erro ao iniciar renderização.");
+      setStep('rendering');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch(step) {
+      case 'mode_selection':
+        return (
+          <div className="step-container animate-in">
+            <h2 className="step-title">Escolha o estilo do vídeo</h2>
+            <div className="mode-cards">
+              <div className={`mode-card ${videoType === 'viral' ? 'selected' : ''}`} onClick={() => setVideoType('viral')}>
+                <Zap size={32} />
+                <div className="mode-content">
+                  <h3>Vídeo Viral</h3>
+                  <p>Focado em retenção e algoritmos de redes sociais.</p>
+                </div>
+              </div>
+              <div className={`mode-card ${videoType === 'creative' ? 'selected' : ''}`} onClick={() => setVideoType('creative')}>
+                <Sparkles size={32} />
+                <div className="mode-content">
+                  <h3>Criativo</h3>
+                  <p>Ideal para produtos, serviços e branding personalizado.</p>
+                </div>
+              </div>
+            </div>
+            <button className="primary-button" onClick={() => setStep(videoType === 'creative' ? 'image_upload' : 'prompt_input')}>
+              Continuar <ChevronRight size={18} />
+            </button>
+          </div>
+        );
+
+      case 'image_upload':
+        return (
+          <div className="step-container animate-in">
+             <button className="back-button" onClick={() => setStep('mode_selection')}><ChevronLeft size={16} /> Voltar</button>
+             <h2 className="step-title">Anexe referências visuais</h2>
+             <p className="step-desc">Adicione fotos do seu produto ou referências de estilo para a IA.</p>
+             <div className="upload-zone" onClick={() => fileInputRef.current?.click()}>
+               <Upload size={32} />
+               <span>Clique para carregar imagens</span>
+               <input type="file" hidden multiple ref={fileInputRef} onChange={handleFileUpload} accept="image/*" />
+             </div>
+             {images.length > 0 && (
+               <div className="image-preview-grid">
+                 {images.map((img, i) => <img key={i} src={img} alt="Ref" />)}
+               </div>
+             )}
+             <button className="primary-button" onClick={() => setStep('prompt_input')} disabled={loading}>
+                {loading ? <Loader2 size={18} className="animate-spin" /> : "Seguir para o Roteiro"}
+             </button>
+          </div>
+        );
+
+      case 'prompt_input':
+        return (
+          <div className="step-container animate-in">
+            <button className="back-button" onClick={() => setStep(videoType === 'creative' ? 'image_upload' : 'mode_selection')}><ChevronLeft size={16} /> Voltar</button>
+            <h2 className="step-title">Qual é o tema do vídeo?</h2>
+            <div className="input-pannel">
+              <div className="pill-input-wrapper">
+                <textarea 
+                  placeholder="Ex: Curiosidades sobre o espaço ou Promoção de Tênis esportivo..."
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  rows={2}
+                />
+              </div>
+              <button 
+                className="primary-button active"
+                onClick={startGeneration}
+                style={{ marginTop: '20px', width: '100%' }}
+                disabled={loading || !prompt.trim()}
+              >
+                {loading ? <Loader2 size={18} className="animate-spin" /> : "Gerar Roteiro e Cenas"}
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'processing_script':
+        return (
+          <div className="status-container animate-in">
+            <Loader2 size={48} className="animate-spin text-blue" />
+            <h2>O motor está criando seu roteiro...</h2>
+            <p>Isso leva cerca de 1 minuto. Acompanhe abaixo.</p>
+          </div>
+        );
+
+      case 'script_review':
+        return (
+          <div className="step-container animate-in">
+            <h2 className="step-title"><CheckCircle2 className="text-green" /> Roteiro Gerado!</h2>
+            <div className="script-review-card">
+              <h3>{scriptData?.title}</h3>
+              <p>{scriptData?.text}</p>
+              <div className="hashtags">{scriptData?.hashtags?.join(' ')}</div>
+            </div>
+            
+            <div className="audio-selection">
+              <h3><Music size={18} /> Escolha uma trilha sonora</h3>
+              <div className="audio-grid">
+                <div className="audio-item selected"><Play size={14} /> Viral Cinematic</div>
+                <div className="audio-item"><Play size={14} /> Corporate Flow</div>
+                <div className="audio-item"><Play size={14} /> Upbeat Tech</div>
+              </div>
+            </div>
+
+            <button className="primary-button" onClick={confirmRender} disabled={loading}>
+              {loading ? <Loader2 size={18} className="animate-spin" /> : "Tudo Certo, Renderizar Vídeo!"}
+            </button>
+          </div>
+        );
+
+      case 'rendering':
+        return (
+          <div className="status-container animate-in">
+            <div className="render-animation">
+               <div className="render-bar"></div>
+            </div>
+            <h2>Estamos montando seu vídeo...</h2>
+            <p>Configurando áudio, legendas e cenas. Quase pronto!</p>
+          </div>
+        );
+
+      case 'completed':
+        return (
+          <div className="step-container animate-in">
+            <h2 className="step-title">Vídeo Pronto para Download! 🚀</h2>
+            <div className="video-preview-card">
+              <video src={videoUrl!} controls />
+            </div>
+            <div className="completion-actions">
+               <a href={videoUrl!} download className="download-button">
+                 <Download size={18} /> Baixar Vídeo
+               </a>
+               <button className="secondary-button" onClick={() => setStep('mode_selection')}>
+                 Criar Novo Vídeo
+               </button>
+            </div>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -162,103 +327,24 @@ const Home = () => {
     <div className="home-container">
       <main className="home-content">
         <header className="home-header">
-          <h1 className="home-title">Olá! O que vamos criar hoje?</h1>
-          <p className="home-subtitle">Crie vídeos virais com IA em segundos.</p>
+          <h1 className="home-title">Flowyn AI Pipeline</h1>
+          <p className="home-subtitle">Sua fábrica de conteúdo interativa.</p>
         </header>
 
         <div className="generation-area">
-          <div className="suggestions-carousel-container">
-            <button className="nav-button prev" onClick={prevSuggestions}>
-              <ChevronLeft size={18} />
-            </button>
-            <div className="suggestions-mask">
-              <div 
-                className="suggestions-track" 
-                style={{ transform: `translateX(-${suggestionsIndex * 100}%)` }}
-              >
-                {suggestions.map((s, i) => (
-                  <button key={i} className="suggestion-card" onClick={() => setPrompt(s.text)}>
-                    <span className="suggestion-icon">{s.icon}</span>
-                    <span className="suggestion-text">{s.text}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button className="nav-button next" onClick={nextSuggestions}>
-              <ChevronRight size={18} />
-            </button>
-          </div>
-
-          <div className="input-pannel">
-            <div className={`pill-input-wrapper ${loading ? 'loading-state' : ''}`}>
-              <Plus className="input-plus-icon" size={20} />
-              <textarea 
-                placeholder="Descreva um nicho (ex: Motivação Bíblica) para gerar um vídeo viral..."
-                value={prompt}
-                onChange={(e) => {
-                  setPrompt(e.target.value);
-                  if (error) setError(null);
-                }}
-                disabled={loading}
-                rows={1}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleGenerate();
-                  }
-                }}
-              />
-              <button 
-                className={`send-button ${prompt.trim() ? 'active' : ''}`}
-                onClick={handleGenerate}
-                disabled={loading || !prompt.trim()}
-              >
-                {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-              </button>
-            </div>
-            
-            {error && (
-              <div className="home-error-badge">
-                <AlertCircle size={14} />
-                <span>{error}</span>
-                {error.includes("Configurações") && (
-                  <button onClick={() => navigate('/configuracoes')} className="error-link">Configurar</button>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="info-carousel-container">
-            <div className="info-carousel-track" style={{ transform: `translateX(-${cardIndex * 100}%)` }}>
-              {infoCards.map((card, i) => (
-                <div key={i} className="info-card-slide">
-                  <div className="info-modern-card-content">
-                     <div className="info-card-text">
-                        <h3>{card.title}</h3>
-                        <p>{card.description}</p>
-                     </div>
-                     <div className="info-card-visual" style={{ color: card.color }}>
-                        {card.icon}
-                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="carousel-dots">
-              {infoCards.map((_, i) => (
-                <div 
-                  key={i} 
-                  className={`carousel-dot ${cardIndex === i ? 'active' : ''}`}
-                  onClick={() => setCardIndex(i)}
-                />
-              ))}
-            </div>
-          </div>
+          {renderStep()}
         </div>
+
+        {error && (
+          <div className="home-error-badge">
+            <AlertCircle size={14} />
+            <span>{error}</span>
+          </div>
+        )}
       </main>
-      
+
       <footer className="home-footer">
-        <p>A Flowyn AI pode cometer erros. Verifique informações importantes.</p>
+        <p>Flowyn AI v2.0 - Upgrade drástico concluído.</p>
       </footer>
     </div>
   );
