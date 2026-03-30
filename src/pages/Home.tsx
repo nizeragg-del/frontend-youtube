@@ -112,11 +112,15 @@ const Home = () => {
         })
       });
 
-      if (!response.ok) throw new Error("Erro ao iniciar motor.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+        throw new Error(`GitHub Error (${response.status}): ${errorData.message}`);
+      }
 
       setStep('processing_script');
     } catch (err: any) {
-      setError(err.message);
+      console.error("Full Generation Error:", err);
+      setError(err.message || "Erro ao iniciar motor.");
     } finally {
       setLoading(false);
     }
@@ -173,10 +177,14 @@ const Home = () => {
         })
       });
 
-      if (!response.ok) throw new Error("Erro ao iniciar renderização.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+        throw new Error(`GitHub Error (${response.status}): ${errorData.message}`);
+      }
       setStep('rendering');
     } catch (err: any) {
-      setError(err.message);
+      console.error("Full Render Error:", err);
+      setError(err.message || "Erro ao iniciar renderização.");
     } finally {
       setLoading(false);
     }
